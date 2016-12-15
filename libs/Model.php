@@ -11,16 +11,34 @@ class Model { //abstract
     protected $lang;
 
     function __construct() {
-        $conn = new mysqli(DB_HOST, DB_HOST, DB_PASS);
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS,DB_NAME);
+//        $conn = new mysqli('localhost', 'root', '', 'apifw');
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
-        $this->db = $conn;
+//        $this->db = $conn;
+        $result = $conn->query("SELECT * FROM user");
+        var_dump($conn);
+        if ($result->num_rows > 0) {
+            // output data of each row
+            while ($row = $result->fetch_assoc()) {
+                var_dump($row);
+            }
+        } else {
+            echo "0 results";
+        }
+        $conn->close();
         $this->lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'vi';
     }
 
-    function getRow($table, $arrField = "*", $where=array()) {
-        $sql = "SELECT $arrField FROM $table WHERE ";
+    function getRow($sql, $value = array()) {
+
+//        $stmt->bind_param("sss", $firstname, $lastname, $email);
+//        if ($stmt->execute()) {
+//            while ($row = $stmt->fetch()) {
+//                print_r($row);
+//            }
+//        }
     }
 
     public function qry_all_category() {

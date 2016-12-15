@@ -16,7 +16,8 @@ class Login_Model extends Model {
 
         $email = $_POST['txtEmail'];
         $pass = $_POST['txtPass'];
-
+        $this->getRow("SELECT * FROM t_cms_person");
+        return;
         $data = $this->db->GetRow("SELECT * FROM t_cms_person 
                             WHERE C_EMAIL=? AND C_PASS=? AND C_ACTIVE_PERSON=1", array($email, $pass));
 
