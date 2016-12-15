@@ -16,29 +16,37 @@ class Model { //abstract
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
-//        $this->db = $conn;
-        $result = $conn->query("SELECT * FROM user");
-        var_dump($conn);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while ($row = $result->fetch_assoc()) {
-                var_dump($row);
-            }
-        } else {
-            echo "0 results";
-        }
-        $conn->close();
+       $this->db = $conn;
+       
         $this->lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'vi';
     }
 
+    function getAll($sql) {
+         $result =  $this->db->query($sql);
+            $arrAllRow=array();
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                  
+                    $arrAllRow=$row;
+                }
+            } else {
+                echo "0 results";
+            }
+              var_dump($arrAllRow);
+    }
     function getRow($sql, $value = array()) {
 
-//        $stmt->bind_param("sss", $firstname, $lastname, $email);
-//        if ($stmt->execute()) {
-//            while ($row = $stmt->fetch()) {
-//                print_r($row);
-//            }
-//        }
+         $result =  $this->db->query("SELECT * FROM user");
+            var_dump($conn);
+            if ($result->num_rows > 0) {
+                // output data of each row
+                while ($row = $result->fetch_assoc()) {
+                    var_dump($row);
+                }
+            } else {
+                echo "0 results";
+            }
+            $conn->close();
     }
 
     public function qry_all_category() {

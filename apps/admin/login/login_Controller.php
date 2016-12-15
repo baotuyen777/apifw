@@ -10,6 +10,7 @@ class Login extends Controller{
              $this->view->render('dsp_login');
         }  
         function login(){
+            echo 222;
             if($this->model->login()){
                 $this->redir(SITE_ROOT."admin/news");
             }  else {
