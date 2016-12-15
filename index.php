@@ -1,5 +1,4 @@
 <?php
-echo 111;
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 define('DS', DIRECTORY_SEPARATOR);

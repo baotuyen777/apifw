@@ -12,7 +12,6 @@ class Bootstrap {
 
         $url = rtrim($url, '/');
         $url = explode('/', $url);
-
         if (empty($url[0]) || empty($url[1])) {
             require 'apps/admin/index/index_Controller.php';
             $controller = new Index();
@@ -30,26 +29,24 @@ class Bootstrap {
         }
         $controller = new $url[1];
         $controller->loadModel($url[1]);
-        
-        $method = $url[2];
-        //calling method co tham so
-        if (isset($url[3])) {
-            if (method_exists($controller, $url[2])) {
-
-                $controller->$method($url[3]);
-            } else {
-                echo "<p>phuong thuc ko ton tai</p>";
+        if (!isset($url[2])) {
+            if (!method_exists($controller, 'index')) {
+                echo "<p>Method index not found</p>";
+                exit();
             }
-            //calling method ko co tham so
+            $controller->index();
+            return;
         } else {
-            if (isset($url[2])) {
-                if (method_exists($controller, $url[2])) {
-                    $controller->$method();
-                } else {
-                    $this->error();
+            if (method_exists($controller, $url[2])) {
+                $method = $url[2];
+                //calling method co tham so
+                if (isset($url[3])) {
+                    $controller->$method($url[3]);
+                    return true;
                 }
+                $controller->$method();
             } else {
-                $controller->index();
+                $this->error();
             }
         }
     }

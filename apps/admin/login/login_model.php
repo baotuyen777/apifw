@@ -13,12 +13,9 @@ class Login_Model extends Model {
     }
 
     public function login() {
-echo 1111;
         $email = $_POST['txtEmail'];
         $pass = $_POST['txtPass'];
-        $this->getAll("SELECT * FROM user");
         
-        return;
         $data = $this->db->getAll("SELECT * FROM user ");
 
 

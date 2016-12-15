@@ -13,7 +13,7 @@ class News extends Controller{
                 header('location: /apifw/admin/login');
                 exit;
             }
-            echo 111;
+            echo 212;
            // var_dump(__('update'));die;
             $this->view->active_menu="news";
     }  
