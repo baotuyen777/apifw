@@ -11,13 +11,13 @@ class Model { //abstract
     protected $lang;
 
     function __construct() {
+        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+//        $conn = new mysqli('localhost', 'root', '', 'apifw');
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        $this->db = $conn;
 
-        $this->db = new PDO(DB_DSN, DB_USER, DB_PASS);
-        
-//        foreach (DB::query("SELECT * FROM wp_users") as $row) {
-//            print_r($row);
-//        }
-        return;
         $this->lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'vi';
     }
 
@@ -35,10 +35,10 @@ class Model { //abstract
     }
 
     public function getVar($sql) {
-//        $result = $this->db->query($sql);
-//        $row = $result->fetch_assoc();
-//
-//        return $row;
+        $result = $this->db->query($sql);
+        $row = $result->fetch_assoc();
+
+        return $row;
     }
 
     function getRow($sql, $value = array()) {

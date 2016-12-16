@@ -13,19 +13,17 @@ class Controller{
     protected $app_name='';
     protected $module_name='';
     function __construct($app,$module) {
-       // echo 'Main controller<br>';
         $this->app_name=$app;
         $this->module_name=$module;
-//     /   $v=$app.'_View';
-        $this->view =new View($app,$module);
     }
+    /** 
+     * @function \loadModel
+     */
      public function  loadModel(){
-       // $path='models/'.$name.'_model.php';
-          $path='apps/'.$this->app_name.'/'.$this->module_name.'/'.$this->module_name.'_model.php';
-        if(file_exists("$path")){
-            require 'apps/'.$this->app_name.'/'.$this->module_name.'/'.$this->module_name.'_model.php';
-            
-            $modelName=$this->module_name.'_Model';
+          $path='apps/'.$this->app_name.'/'.$this->module_name.'/model.php';
+        if(file_exists($path)){
+            require $path;
+            $modelName=$this->module_name.'Model';
             $this->model=new $modelName();
         }
     }
