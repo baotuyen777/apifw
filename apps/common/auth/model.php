@@ -24,7 +24,7 @@ class authModel extends Model {
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':pass', $password);
-        $stmt->execute($stmt);
+        $stmt->execute();
         $result = $stmt->fetchAll();
         var_dump($result);
 
