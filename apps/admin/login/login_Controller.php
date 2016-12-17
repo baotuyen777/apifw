@@ -4,10 +4,8 @@ class Login extends Controller{
         function __construct(){
             parent::__construct('admin','login');
 //            $this->views->active_menu="";
-           echo 222;
         }
         function index(){    
-            echo 1111;
              $this->view->render('dsp_login');
         }  
         function login(){
