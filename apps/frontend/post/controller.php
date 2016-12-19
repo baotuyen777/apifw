@@ -13,6 +13,7 @@ class postController extends Controller {
     }
 
     function getAllPost($filter = "") {
+        Helper::checkAPI('POST', array("a", "b"));
         $filter = isset($_POST['$filter']) ? $_POST['$filter'] : "";
         $checkTolen = Helper::checkToken();
         $result = array(
@@ -21,18 +22,15 @@ class postController extends Controller {
         );
         if ($checkTolen['status']) {
             $arrAllData = $this->model->getAllPost($filter);
-//            var_dump( $arrAllData);
             $result = array(
                 "status" => true,
                 'data' => $arrAllData
             );
-        }else{
-            $result['message']=$checkTolen['message'];
+        } else {
+            $result['message'] = $checkTolen['message'];
         }
 
-
-        header('Content-Type: application/json');
-        echo json_encode($result);
+        Helper::showData($result);
     }
 
     function logout($abc) {

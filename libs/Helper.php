@@ -1,17 +1,13 @@
 <?php
 
-/**
- * Description of Helper
- *
- * @author michael
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-class Helper {
 
-    /**
-     * 
-     * @param type $data
-     * @return type
-     */
+class Helper {
+    public $result;
     static function base64url_encode($data) {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
@@ -60,7 +56,7 @@ class Helper {
         if ($token) {
             $arrToken = explode(".", $token);
             $signature = ($arrToken[2]);
-            $mes = "signature invalid!";
+            $mes = "token invalid!";
             $status = false;
             $data = new stdClass();
             if ($signature === self::encodeSignature($arrToken[0] . "." . $arrToken[1])) {
@@ -86,6 +82,47 @@ class Helper {
         }
 
         return $result;
+    }
+
+    /**
+     * 
+     * @param type $method = GET
+     * @param type $params check require
+     */
+    static function checkAPI($method = "GET", $params = array()) {
+        $result = array(
+            "status" => false,
+            "message" => "Something wrong!"
+        );
+        if ($_SERVER['REQUEST_METHOD'] !== $method) {
+            $result['message'] = "Please use method {" . $method . "}";
+            $result['status'] = false;
+        } else {
+            $require = true;
+            $requireField = "";
+            foreach ($params as $param) {
+                if (!isset($_REQUEST[$param]) || $_REQUEST[$param] == '') {
+                    $requireField .= "{" . $param . "}";
+                    $require = FALSE;
+                    break;
+                }
+            }
+            if (!$require) {
+                $require["message"] = "Please input require field !" . $requireField;
+                $result['status'] = false;
+            }
+        }
+        $this->result=$result;
+//        self::showData($result);
+    }
+
+    /**
+     * 
+     * @param type $result
+     */
+    static function showData($result) {
+        header('Content-Type: application/json');
+        echo json_encode($result);
     }
 
 }

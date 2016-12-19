@@ -15,7 +15,7 @@ require 'libs/DB.php';
 require 'libs/Helper.php';
 //lang
 error_reporting(E_ALL & ~E_DEPRECATED);
-require 'libs/function.php';
+//require 'libs/function.php';
  
 //$lang_get= Session::get('lang');
 //        if ($lang_get=='en') {
