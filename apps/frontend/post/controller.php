@@ -13,16 +13,17 @@ class postController extends Controller {
     }
 
     function getAllPost() {
-        if (!$this->checkAPI('POST', array("a", "b"))) {
+        if (!$this->checkAPI('GET')) {
             $this->showJson();
             return;
         }
 
         $total = 100;
         $params = array(
-            'limit' => isset($_POST['filter']) ? filter_var($_POST['filter'], FILTER_SANITIZE_STRING) : 10,
-            'filter' => isset($_POST['filter']) ? filter_var($_POST['filter'], FILTER_SANITIZE_STRING) : "",
-            'page' => isset($_POST['page']) ? filter_var($_POST['page'], FILTER_SANITIZE_STRING) : 1
+            'limit' => isset($_REQUEST['limit']) ? filter_var($_REQUEST['limit'], FILTER_SANITIZE_STRING) : 10,
+            'filter' => isset($_REQUEST['filter']) ? filter_var($_REQUEST['filter'], FILTER_SANITIZE_STRING) : "",
+            'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_STRING) : 1,
+            'total' => $total
         );
         $arrAllData = $this->model->getAllPost($params);
         $result = array(
