@@ -11,12 +11,16 @@ class Model { //abstract
     protected $lang;
 
     function __construct() {
-
         $this->db = new PDO(DB_DSN, DB_USER, DB_PASS);
-
         $this->lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'vi';
     }
 
+    /**
+     * 
+     * @param type $sql
+     * @param type $params
+     * @return type
+     */
     function getVar($sql, $params) {
         $stmt = $this->db->prepare($sql);
         $i = 0;
@@ -29,6 +33,11 @@ class Model { //abstract
         return $result;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @return type
+     */
     function getUserById($id) {
         $sql = 'SELECT ID, user_login, user_email, user_status, display_name FROM wp_users WHERE ID= :id';
         $stmt = $this->db->prepare($sql);

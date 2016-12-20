@@ -10,25 +10,17 @@ class postModel extends Model {
         parent::__construct();
     }
 
-    /**
-     * 
-     * @param type $email
-     * @param type $pass
-     * @return boolean
-     */
+  
     public function getAllPost($filter) {
+        $cond= $filter!="" ? ' AND post_title like "%'.$filter.'%"' : "";
         $sql = 'SELECT * FROM wp_posts '
-                . 'WHERE post_type="post" and post_status= "publish"';
+                . 'WHERE post_type="post" and post_status= "publish"'.$cond;
         $stmt = $this->db->prepare($sql);
-//        $stmt->bindValue(':id', $id);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
-    public function logout() {
-        echo 12121;
-    }
 
 }
 

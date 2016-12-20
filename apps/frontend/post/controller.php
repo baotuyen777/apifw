@@ -13,24 +13,17 @@ class postController extends Controller {
     }
 
     function getAllPost($filter = "") {
-        Helper::checkAPI('POST', array("a", "b"));
-        $filter = isset($_POST['$filter']) ? $_POST['$filter'] : "";
-        $checkTolen = Helper::checkToken();
-        $result = array(
-            "status" => false,
-            "message" => ""
-        );
-        if ($checkTolen['status']) {
-            $arrAllData = $this->model->getAllPost($filter);
-            $result = array(
-                "status" => true,
-                'data' => $arrAllData
-            );
-        } else {
-            $result['message'] = $checkTolen['message'];
+        if (!$this->checkAPI('POST', array("a", "b"))) {
+            $this->showJson();
+            return;
         }
-
-        Helper::showData($result);
+        $filter = isset($_POST['filter']) ? filter_var($_POST['filter'],FILTER_SANITIZE_STRING) : "";
+        $arrAllData = $this->model->getAllPost($filter);
+        $result = array(
+            "status" => true,
+            'data' => $arrAllData
+        );
+        $this->showJson($result);
     }
 
     function logout($abc) {
