@@ -12,13 +12,19 @@ class postController extends Controller {
         $this->getAllPost();
     }
 
-    function getAllPost($filter = "") {
+    function getAllPost() {
         if (!$this->checkAPI('POST', array("a", "b"))) {
             $this->showJson();
             return;
         }
-        $filter = isset($_POST['filter']) ? filter_var($_POST['filter'],FILTER_SANITIZE_STRING) : "";
-        $arrAllData = $this->model->getAllPost($filter);
+
+        $total = 100;
+        $params = array(
+            'limit' => isset($_POST['filter']) ? filter_var($_POST['filter'], FILTER_SANITIZE_STRING) : 10,
+            'filter' => isset($_POST['filter']) ? filter_var($_POST['filter'], FILTER_SANITIZE_STRING) : "",
+            'page' => isset($_POST['page']) ? filter_var($_POST['page'], FILTER_SANITIZE_STRING) : 1
+        );
+        $arrAllData = $this->model->getAllPost($params);
         $result = array(
             "status" => true,
             'data' => $arrAllData

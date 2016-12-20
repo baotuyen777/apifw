@@ -8,7 +8,7 @@
 class Bootstrap {
 
     function __construct() {
-        $url = isset($_GET['url']) ? $_GET['url'] : null;
+        $url = isset($_GET['url']) ? filter_var($_GET['url'],FILTER_SANITIZE_STRING) : null;
 
         $url = rtrim($url, '/');
         $url = explode('/', $url);

@@ -3,15 +3,14 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 define('DS', DIRECTORY_SEPARATOR);
 define('SERVER_ROOT', __DIR__ . DS);
-//config
+/**config */
 require 'config.php';
-//mvc
+/**library */
 require 'libs/Bootstrap.php';
 require 'libs/Controller.php';
 require 'libs/Model.php';
-require 'libs/View.php';
 require 'libs/DB.php';
-//library
+
 require 'libs/Helper.php';
 //lang
 error_reporting(E_ALL & ~E_DEPRECATED);
