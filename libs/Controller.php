@@ -35,9 +35,9 @@ class Controller {
     /**
      * 
      * @param type $method = GET
-     * @param type $params check require
+     * @param type $requireFields check require
      */
-    function checkAPI($method = "GET", $params = array()) {
+    function checkAPI($method = "GET", $requireFields = array()) {
         $result = $this->result;
         /** check method */
         if ($_SERVER['REQUEST_METHOD'] !== $method && $method !=="GET") {
@@ -53,16 +53,16 @@ class Controller {
         /** check require field */
         $require = true;
         $requireField = "";
-        foreach ($params as $param) {
+        foreach ($requireFields as $requireField) {
             if ($method == "GET") {
-                if (!isset($_GET[$param]) || $_GET[$param] == '') {
-                    $requireField .= "{" . $param . "}";
+                if (!isset($_GET[$requireField]) || $_GET[$requireField] == '') {
+                    $requireField .= "{" . $requireField . "}";
                     $require = false;
                     break;
                 }
             } else {
-                if (!isset($_POST[$param]) || $_POST[$param] == '') {
-                    $requireField .= "{" . $param . "}";
+                if (!isset($_POST[$requireField]) || $_POST[$requireField] == '') {
+                    $requireField .= "{" . $requireField . "}";
                     $require = false;
                     break;
                 }
