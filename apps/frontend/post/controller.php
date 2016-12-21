@@ -20,7 +20,7 @@ class postController extends Controller {
 
         $total = 100;
         $params = array(
-            'limit' => isset($_REQUEST['limit']) ? filter_var($_REQUEST['limit'], FILTER_SANITIZE_STRING) : 10,
+            'postPerPage' => isset($_REQUEST['postPerPage']) ? filter_var($_REQUEST['postPerPage'], FILTER_SANITIZE_STRING) : 10,
             'filter' => isset($_REQUEST['filter']) ? filter_var($_REQUEST['filter'], FILTER_SANITIZE_STRING) : "",
             'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_STRING) : 1,
             'total' => $total
@@ -28,8 +28,9 @@ class postController extends Controller {
         $arrAllData = $this->model->getAllPost($params);
         $result = array(
             "status" => true,
-            'data' => $arrAllData
+            'data' => $arrAllData,
         );
+        $result = array_merge($params,$result);
         $this->showJson($result);
     }
 
