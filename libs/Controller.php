@@ -13,6 +13,9 @@ class Controller {
     /** @var \result */
     public $result;
 
+    /** @var \token */
+    public $token;
+
     function __construct() {
         $this->result = array(
             "status" => false,
@@ -38,9 +41,8 @@ class Controller {
      * @param type $requireFields check require
      */
     function checkAPI($method = "GET", $requireFields = array()) {
-        $result = $this->result;
         /** check method */
-        if ($_SERVER['REQUEST_METHOD'] !== $method && $method !=="GET") {
+        if ($_SERVER['REQUEST_METHOD'] !== $method && $method !== "GET") {
             $this->result['message'] = "Please use method {" . $method . "}";
             return false;
         }
@@ -52,30 +54,40 @@ class Controller {
         }
         /** check require field */
         $require = true;
-        $requireField = "";
+        $field = "";
         foreach ($requireFields as $requireField) {
             if ($method == "GET") {
                 if (!isset($_GET[$requireField]) || $_GET[$requireField] == '') {
-                    $requireField .= "{" . $requireField . "}";
+                    $field .= "{" . $requireField . "}";
                     $require = false;
                     break;
                 }
-            } else {
+            }
+            if ($method == "POST") {
                 if (!isset($_POST[$requireField]) || $_POST[$requireField] == '') {
-                    $requireField .= "{" . $requireField . "}";
+                    $field .= "{" . $requireField . "}";
+                    $require = false;
+                    break;
+                }
+            }
+            if ($method == "PUT") {
+                parse_str(file_get_contents("php://input"), $post_vars);
+                if (!isset($post_vars[$requireField]) || $post_vars[$requireField] == '') {
+                    $field .= "{" . $requireField . "}";
                     $require = false;
                     break;
                 }
             }
         }
         if (!$require) {
-            $this->result['message'] = "Please input require field " . $requireField;
+            $this->result['message'] = "Please input require field " . $field;
             return false;
         }
         $this->result = array(
             "status" => true,
-            "message" => '200'
+            "message" => '200',
         );
+        $this->token = $checkTolen['data'];
         return true;
     }
 
@@ -93,7 +105,7 @@ class Controller {
      * 
      * @param type $result
      */
-    function showJson($data=false) {
+    function showJson($data = false) {
         header('Content-Type: application/json');
         if ($data) {
             $this->changeResult($data);

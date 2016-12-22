@@ -77,4 +77,33 @@ class Helper {
         return $result;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @param type $table
+     */
+    static function checkId($table, $field, $val) {
+        $result = array(
+            "status" => false,
+            'message' => "Some thing wrong",
+        );
+        if (!$val) {
+            $result['message'] = "please input {id} in URL";
+            return $result;
+        }
+        $sql = "SELECT {$field} FROM {$table} WHERE {$field}=:val ";
+        $stmt = DB::getInstance()->prepare($sql);
+        $stmt->bindValue(":val", $val);
+        $stmt->execute();
+        if (!$stmt->fetchColumn()) {
+            $result['message'] = "{$field} not found!";
+            return $result;
+        }
+        $result = array(
+            "status" => true,
+            'message' => "200",
+        );
+        return $result;
+    }
+
 }
