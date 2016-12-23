@@ -56,7 +56,7 @@ class postController extends Controller {
             if (!$arrSingleObject) {
                 $result = array(
                     "status" => false,
-                    'message' => "{id} not found or deactive",
+                    'message' => "{id} ".LANG::__("IdNotFound"),
                 );
             }
         }
