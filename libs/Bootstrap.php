@@ -12,51 +12,56 @@ class Bootstrap {
 
         $url = rtrim($url, '/');
         $url = explode('/', $url);
-
+//        var_dump($url);
         if (empty($url[0])) {
             
+        }
+        /** find languate */
+        if (isset($_GET['lang'])) {
+            $file = 'libs/lang/' . $_GET['lang'] . '.php';
+        } else {
+            $file = 'libs/lang/en.php';
+        }
+        if (file_exists($file)) {
+            require $file;
+        } else {
+            require 'lang/en.php';
         }
         /**  run default */
         if (empty($url[0])) {
             require 'apps/common/index/controller.php';
-            require 'lang/en.php';
             $controller = new Index();
             $controller->index();
             return FALSE;
         } else {
-            /** find languate */
-            $file = 'libs/lang/' . $url[0] . '.php';
-            if (file_exists($file)) {
-                require $file;
-                $this->loadModule($url,1);
-            } else {
-                require 'lang/en.php';
-                $this->loadModule($url,0);
-            }
+            $this->loadModule($url);
         }
     }
 
-    function loadModule($url,$indexCustom) {
+    function loadModule($url) {
         //find in common
         $app = 'common';
-        $file = 'apps/' . $app . '/' . $url[0+$indexCustom] . '/controller.php';
+        $file = 'apps/' . $app . '/' . $url[0] . '/controller.php';
         if (file_exists($file)) {
             require $file;
-
-            $module = $url[0+$indexCustom];
-                 
-            $method = isset($url[1+$indexCustom]) ? $url[1+$indexCustom] : false;
-            $param = isset($url[2+$indexCustom]) ? $url[2+$indexCustom] : false;
+            $module = $url[0];
+            $method = isset($url[1]) ? $url[1] : false;
+            if ($method > 0) {
+                $param = $method;
+                $method = 'index';
+            } else {
+                $param = isset($url[2]) ? $url[2] : false;
+            }
         } else {
             // find in module
-            if (isset($url[1+$indexCustom])) {
-                $file = 'apps/' . $url[0+$indexCustom] . '/' . $url[1+$indexCustom] . '/controller.php';
+            if (isset($url[1])) {
+                $file = 'apps/' . $url[0] . '/' . $url[1] . '/controller.php';
                 if (file_exists($file)) {
                     require $file;
-                    $app = $url[0+$indexCustom];
-                    $module = $url[1+$indexCustom];
-                    $method = isset($url[2+$indexCustom]) ? $url[2+$indexCustom] : false;
-                    $param = isset($url[3+$indexCustom]) ? $url[3+$indexCustom] : false;
+                    $app = $url[0];
+                    $module = $url[1];
+                    $method = isset($url[2]) ? $url[2] : false;
+                    $param = isset($url[3]) ? $url[3] : false;
                 }
             } else {
                 $this->error();

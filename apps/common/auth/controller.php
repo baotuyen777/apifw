@@ -12,6 +12,39 @@ class authController extends Controller {
         $this->login();
     }
 
+    /**
+     * @api {post} /login Login 
+     * @apiName Login
+     * @apiGroup Auth
+     *
+     * @apiParam {String} email Email .
+     *
+     * @apiSuccess {String} password Password of the User.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": "true",
+     *       "message": "Login success",
+     *       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkYXZpZGJ1aSIsImV4cCI6MTQ4NjQzMjQyMywidXNlciI6IjIifQ.cc705f8a13a9839ee685336ac682faf4",
+     *       "data": {
+     *          "ID": "2",
+     *          "user_login": "tuyen",
+     *          "user_email": "tuyen@gmail.com",
+     *          "user_status": "0",
+     *          "display_name": "tuyen"
+     *      }
+     *     }
+     *
+     * @apiError UserNotFound The id of the User was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *         "status": false,
+     *         "message": "Wrong {password} or {email}!"
+     *     }
+     */
     function login() {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $email = isset($_POST['email']) ? $_POST['email'] : false;
@@ -43,8 +76,36 @@ class authController extends Controller {
         echo json_encode($result);
     }
 
-    function logout($abc) {
-        $this->model->logout();
+    /**
+     * @api {post} /logout Login 
+     * @apiName Logout
+     * @apiGroup Auth
+     *
+     * @apiSuccess {String} password Password of the User.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": "true",
+     *       "message": "Logout success",
+     *     }
+     *
+     * @apiError UserNotFound The id of the User was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *         "status": false,
+     *         "message": "Wrong {password} or {email}!"
+     *     }
+     */
+    function logout() {
+        $result = array(
+            "status" => true,
+            "message" => "Logout success"
+        );
+        header('Content-Type: application/json');
+        echo json_encode($result);
     }
 
 }
