@@ -139,10 +139,67 @@ class UserController extends Controller {
      * @apiName AddUser
      * @apiGroup User
      *
-     * @apiParam {String} user_email Email unique ID.
+     * @apiParam {String} email Email unique ID.
      *
-     * @apiSuccess {String} user_pass Passoword of the User.
-     * @apiSuccess {String} display_name  Display name of the User.
+     * @apiSuccess {String} pass Passoword of the User.
+     * @apiSuccess {String} name  Display name of the User.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "message": "200",
+     *       "id": 10
+     *     }
+     *
+     * @apiError UserNotFound The id of the User was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *       "message": "token invalid!"
+     *     }
+     */
+    function add() {
+        $requireFields = array('email', 'password', 'name');
+        $allFieldsAllow = array_merge($requireFields, array());
+
+        if (!$this->checkAPI('POST', $requireFields)) {
+            $this->showJson();
+            return;
+        }
+
+        $params = array(
+            'user_email' => $_POST['email'],
+            'user_pass' => $_POST['password'],
+            'display_name' => $_POST['name']
+        );
+        $id = $this->model->addUser($params);
+        if ($id) {
+            $result = array(
+                "status" => true,
+                'id' => $id,
+            );
+        } else {
+            $result = array(
+                "status" => false,
+                'message' => "something wrong! please contact admin!",
+            );
+        }
+
+        $this->showJson($result);
+    }
+
+    /**
+     * @api {put} /user Update User 
+     * @apiName UpdateUser
+     * @apiGroup User
+     *
+     * @apiParam {String} email Email unique ID.
+     *
+     * @apiSuccess {String} pass Passoword of the User.
+     * @apiSuccess {String} name  Display name of the User.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -165,43 +222,6 @@ class UserController extends Controller {
      *       "message": "token invalid!"
      *     }
      */
-    function add() {
-        $requireFields = array('email', 'password', 'name');
-        $allFieldsAllow = array_merge($requireFields, array());
-
-        if (!$this->checkAPI('POST', $requireFields)) {
-            $this->showJson();
-            return;
-        }
-        /** remove useless element */
-//        $flip = array_flip($_POST);
-//        $intersect = array_intersect($flip, $allFieldsAllow);
-//        $params = array_flip($intersect);
-//        /** add default field */
-//        $defaultField = array(
-//        );
-//        $params = array_merge($defaultField, $params);
-        $params = array(
-            'user_email' => $_POST['email'],
-            'user_pass' => $_POST['password'],
-            'name' => $_POST['display_name']
-        );
-        $id = $this->model->addUser($params);
-        if ($id) {
-            $result = array(
-                "status" => true,
-                'id' => $id,
-            );
-        } else {
-            $result = array(
-                "status" => false,
-                'message' => "something wrong! please contact admin!",
-            );
-        }
-
-        $this->showJson($result);
-    }
-
     function update($id) {
         $requireFields = array();
         $allFieldsAllow = array_merge($requireFields, array('post_title', 'post_content', 'post_name', 'post_type', 'post_status', 'post_excerpt'));
@@ -237,6 +257,33 @@ class UserController extends Controller {
         $this->showJson($result);
     }
 
+    /**
+     * @api {delete} /user Update User 
+     * @apiName DeleteUser
+     * @apiGroup User
+     *
+     * @apiParam {String} email Email unique ID.
+     *
+     * @apiSuccess {String} pass Passoword of the User.
+     * @apiSuccess {String} name  Display name of the User.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "message": "200",
+     *     }
+     *
+     * @apiError UserNotFound The id of the User was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *       "message": "token invalid!"
+     *     }
+     */
+    
     function delete($id) {
         if (!$this->checkAPI('DELETE')) {
             $this->showJson();
