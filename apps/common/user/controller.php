@@ -28,7 +28,7 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {get} /user/:id Request User information
+     * @api {get} /user Request User information
      * @apiName All
      * @apiGroup User
      *
@@ -82,8 +82,8 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {get} /user/:id Request User information
-     * @apiName GetUser
+     * @api {get} /user/:id Request detail User information
+     * @apiName Detail
      * @apiGroup User
      *
      * @apiParam {Number} id Users unique ID.
@@ -96,11 +96,7 @@ class UserController extends Controller {
      *     {
      *       "status": true,
      *       "message": "200",
-     *       "postPerPage": 10,
-     *       "filter": "",
-     *       "page": 1,
-     *       "total": 1,
-     *       "data":[]
+     *       "data": [],
      *     }
      *
      * @apiError UserNotFound The id of the User was not found.
@@ -109,7 +105,7 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "token invalid!"
+     *       "message": "{id} not found or deactive"
      *     }
      */
     function detail($id) {
@@ -158,13 +154,11 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "token invalid!"
+     *       "message": "Please input require field {email}"
      *     }
      */
     function add() {
         $requireFields = array('email', 'password', 'name');
-        $allFieldsAllow = array_merge($requireFields, array());
-
         if (!$this->checkAPI('POST', $requireFields)) {
             $this->showJson();
             return;
@@ -219,29 +213,29 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "token invalid!"
+     *        "message": "ID not found!"
      *     }
      */
     function update($id) {
         $requireFields = array();
-        $allFieldsAllow = array_merge($requireFields, array('post_title', 'post_content', 'post_name', 'post_type', 'post_status', 'post_excerpt'));
 
         if (!$this->checkAPI('PUT', $requireFields)) {
             $this->showJson();
             return;
         }
         /** check exist id */
-        $checkId = Helper::checkId("wp_posts", 'ID', $id);
+        $checkId = Helper::checkId("wp_users", 'ID', $id);
         if (!$checkId['status']) {
             $this->showJson($checkId);
             return;
         }
         parse_str(file_get_contents("php://input"), $put_vars);
 
-        /** remove useless element */
-        $flip = array_flip($put_vars);
-        $intersect = array_intersect($flip, $allFieldsAllow);
-        $params = array_flip($intersect);
+        $params = array(
+            'user_email' => $_POST['email'],
+            'user_pass' => $_POST['password'],
+            'display_name' => $_POST['name']
+        );
 
         if ($this->model->updateUser($id, $params)) {
             $result = array(
@@ -283,7 +277,6 @@ class UserController extends Controller {
      *       "message": "token invalid!"
      *     }
      */
-    
     function delete($id) {
         if (!$this->checkAPI('DELETE')) {
             $this->showJson();
@@ -334,6 +327,9 @@ class UserController extends Controller {
             );
         }
         $this->showJson($result);
+    }
+    private function transform($object){
+        
     }
 
 }
