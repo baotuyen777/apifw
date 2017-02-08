@@ -39,13 +39,14 @@ class Bootstrap {
     }
 
     function loadModule($url) {
-        //find in common
+        //find module in common
         $app = 'common';
         $file = 'apps/' . $app . '/' . $url[0] . '/controller.php';
         if (file_exists($file)) {
             require $file;
             $module = $url[0];
             $method = isset($url[1]) ? $url[1] : false;
+           
             if ($method > 0) {
                 $param = $method;
                 $method = 'index';
@@ -53,7 +54,7 @@ class Bootstrap {
                 $param = isset($url[2]) ? $url[2] : false;
             }
         } else {
-            // find in module
+            // find module in other apps
             if (isset($url[1])) {
                 $file = 'apps/' . $url[0] . '/' . $url[1] . '/controller.php';
                 if (file_exists($file)) {
@@ -84,7 +85,7 @@ class Bootstrap {
     function loadMethod($controller, $method, $param) {
         if (!$method) {
             if (method_exists($controller, 'index')) {
-                $controller->index();
+                $controller->index($param);
             } else {
                 $this->error();
             }

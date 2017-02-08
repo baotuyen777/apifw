@@ -8,14 +8,22 @@ class UserController extends Controller {
         parent::__construct('frontend', 'post');
     }
 
-    function index() {
+    function index($id) {
         if ($_SERVER['REQUEST_METHOD'] == "GET") {
-            var_dump($_SERVER);
-            $this->all();
+            if ($id) {
+                $this->detail($id);
+            } else {
+                $this->all();
+            }
         }
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            
             $this->add();
+        }
+        if ($_SERVER['REQUEST_METHOD'] == "PUT") {
+            $this->update($id);
+        }
+        if ($_SERVER['REQUEST_METHOD'] == "DELETE") {
+            $this->delete($id);
         }
     }
 
@@ -166,15 +174,18 @@ class UserController extends Controller {
             return;
         }
         /** remove useless element */
-        $flip = array_flip($_POST);
-        $intersect = array_intersect($flip, $allFieldsAllow);
-        $params = array_flip($intersect);
-        /** add default field */
-        $defaultField = array(
+//        $flip = array_flip($_POST);
+//        $intersect = array_intersect($flip, $allFieldsAllow);
+//        $params = array_flip($intersect);
+//        /** add default field */
+//        $defaultField = array(
+//        );
+//        $params = array_merge($defaultField, $params);
+        $params = array(
+            'user_email' => $_POST['email'],
+            'user_pass' => $_POST['password'],
+            'name' => $_POST['display_name']
         );
-        $params = array_merge($defaultField, $params);
-        var_dump($params);
-        die;
         $id = $this->model->addUser($params);
         if ($id) {
             $result = array(
@@ -232,7 +243,7 @@ class UserController extends Controller {
             return;
         }
         /** check exist id */
-        $checkId = Helper::checkId("wp_posts", 'ID', $id);
+        $checkId = Helper::checkId("wp_user", 'ID', $id);
         if (!$checkId['status']) {
             $this->showJson($checkId);
             return;
