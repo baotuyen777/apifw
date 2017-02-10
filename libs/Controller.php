@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-class Controller {
+abstract class Controller {
 
     /** @var \Model */
     public $model;
@@ -15,6 +15,9 @@ class Controller {
 
     /** @var \token */
     public $token;
+
+    /** @var \requireFields */
+    public $requireFields = array();
 
     function __construct() {
         $this->result = array(
@@ -40,7 +43,7 @@ class Controller {
      * @param type $method = GET
      * @param type $requireFields check require
      */
-    function checkAPI($method = "GET", $requireFields = array()) {
+    function checkAPI($method = "GET") {
         /** check method */
         if ($_SERVER['REQUEST_METHOD'] !== $method && $method !== "GET") {
             $this->result['message'] = "Please use method {" . $method . "}";
@@ -55,7 +58,7 @@ class Controller {
         /** check require field */
         $require = true;
         $field = "";
-        foreach ($requireFields as $requireField) {
+        foreach ($this->requireFields as $requireField) {
             if ($method == "GET") {
                 if (!isset($_GET[$requireField]) || $_GET[$requireField] == '') {
                     $field .= "{" . $requireField . "}";

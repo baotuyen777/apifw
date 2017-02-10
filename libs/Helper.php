@@ -34,7 +34,7 @@ class Helper {
         $header = self::base64url_encode(json_encode($arrHeader));
         $arrPayload = array(
             "iss" => "davidbui",
-            "exp" => time() + (24 * 60 * 60),
+            "exp" => time() + (7*24 * 60 * 60),
             "user" => $userId
         );
         $payload = self::base64url_encode(json_encode($arrPayload));
@@ -105,5 +105,6 @@ class Helper {
         );
         return $result;
     }
+    
 
 }

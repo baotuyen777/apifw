@@ -108,6 +108,28 @@ class authController extends Controller {
         echo json_encode($result);
     }
 
+    public function resetPassword() {
+        $this->requireFields = array('email');
+        if (!$this->checkAPI('POST')) {
+            $this->showJson();
+            return;
+        }
+        $error = 'something wrong! please contact admin!';
+        $email = ($_POST["email"]);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = "Invalid email format";
+            $result = array(
+                "status" => false,
+                'message' => $error,
+            );
+            $this->showJson();
+            return;
+        }
+
+        $data = $this->model->resetPassword($email);
+        $this->showJson($data);
+    }
+
 }
 
 ?>

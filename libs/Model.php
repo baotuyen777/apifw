@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-class Model { //abstract
+abstract class Model {
 
     public $db;
     protected $lang;
@@ -47,6 +47,58 @@ class Model { //abstract
         return $result;
     }
 
+    /**
+     * 
+     * @param type $id
+     * @return type
+     */
+    public function getUserByEmail($email) {
+        $sql = "SELECT ID as id FROM " . $this->table . " WHERE user_email=:email ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":email", $email);
+        $stmt->execute();
+        $result = $stmt->fetchObject();
+        return $result;
+    }
+
+    function transforms($result) {
+        return array_map([$this, 'transform'], $result);
+    }
+
+    function transform($result) {
+        $adapter = array_flip($this->adapter);
+        $data = array();  // set up a return array
+        foreach ($result as $k => $v) {
+            foreach ($adapter as $virtual => $real) {
+                if ($k == $virtual) {
+                    $data[$real] = $v;
+                }
+            }
+        }
+        return $data;
+    }
+
+    function transformInvert($result) {
+        $adapter = ($this->adapter);
+        $data = array();  // set up a return array
+        foreach ($result as $k => $v) {
+            foreach ($adapter as $virtual => $real) {
+                if ($k == $virtual) {
+                    $data[$real] = $v;
+                }
+            }
+        }
+        return $data;
+    }
+
+//    function transform($object) {
+//        return [
+//            'id' => $object['ID'],
+//            'password' => $object['user_pass'],
+//            'email' => $object['user_email'],
+//            'name' => $object['display_name']
+//        ];
+//    }
 }
 
 ?>

@@ -2,10 +2,10 @@
 
 class UserController extends Controller {
 
-    public $auth;
+//    public $auth;
 
     function __construct() {
-        parent::__construct('frontend', 'post');
+        parent::__construct();
     }
 
     function index($id) {
@@ -33,6 +33,9 @@ class UserController extends Controller {
      * @apiGroup User
      *
      * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} postPerPage Post Per Page.
+     * @apiParam {String} filter Users .
+     * @apiParam {Number} page Page .
      *
      * @apiSuccess {Number} postPerPage Post Per Page.
      * @apiSuccess {String} filter  Filter of the User.
@@ -88,8 +91,7 @@ class UserController extends Controller {
      *
      * @apiParam {Number} id Users unique ID.
      *
-     * @apiSuccess {String} firstname Firstname of the User.
-     * @apiSuccess {String} lastname  Lastname of the User.
+     * @apiSuccess {String} data Firstname of the User.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -136,9 +138,10 @@ class UserController extends Controller {
      * @apiGroup User
      *
      * @apiParam {String} email Email unique ID.
+     * @apiParam {String} password Password .
+     * @apiParam {String} name Name .
      *
-     * @apiSuccess {String} pass Passoword of the User.
-     * @apiSuccess {String} name  Display name of the User.
+     * @apiSuccess {String} status status of the API.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -158,17 +161,32 @@ class UserController extends Controller {
      *     }
      */
     function add() {
-        $requireFields = array('email', 'password', 'name');
-        if (!$this->checkAPI('POST', $requireFields)) {
+        $this->requireFields = array('email', 'password', 'name');
+        if (!$this->checkAPI('POST')) {
             $this->showJson();
             return;
         }
 
-        $params = array(
-            'user_email' => $_POST['email'],
-            'user_pass' => $_POST['password'],
-            'display_name' => $_POST['name']
-        );
+//        $params = array(
+//            'user_email' => $_POST['email'],
+//            'user_pass' => md5($_POST['password']),
+//            'display_name' => $_POST['name']
+//        );
+        $params = $_POST;
+        $params['password'] = md5($_POST['password']);
+        $email = ($_POST["email"]);
+        //validate email
+        $flag= false;
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = "Invalid email format";
+            $result = array(
+                "status" => false,
+                'message' => $error,
+            );
+            $this->showJson();
+            return;
+        }
+
         $id = $this->model->addUser($params);
         if ($id) {
             $result = array(
@@ -190,21 +208,15 @@ class UserController extends Controller {
      * @apiName UpdateUser
      * @apiGroup User
      *
-     * @apiParam {String} email Email unique ID.
+     * @apiParam {Number} id Users unique ID.
      *
-     * @apiSuccess {String} pass Passoword of the User.
-     * @apiSuccess {String} name  Display name of the User.
+     * @apiSuccess {String} status status of the API.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "status": true,
      *       "message": "200",
-     *       "postPerPage": 10,
-     *       "filter": "",
-     *       "page": 1,
-     *       "total": 1,
-     *       "data":[]
      *     }
      *
      * @apiError UserNotFound The id of the User was not found.
@@ -217,27 +229,21 @@ class UserController extends Controller {
      *     }
      */
     function update($id) {
-        $requireFields = array();
 
-        if (!$this->checkAPI('PUT', $requireFields)) {
+        if (!$this->checkAPI('PUT')) {
             $this->showJson();
             return;
         }
         /** check exist id */
-        $checkId = Helper::checkId("wp_users", 'ID', $id);
+        $checkId = Helper::checkId($this->model->table, 'ID', $id);
         if (!$checkId['status']) {
             $this->showJson($checkId);
             return;
         }
         parse_str(file_get_contents("php://input"), $put_vars);
-
-        $params = array(
-            'user_email' => $_POST['email'],
-            'user_pass' => $_POST['password'],
-            'display_name' => $_POST['name']
-        );
-
-        if ($this->model->updateUser($id, $params)) {
+//validate
+//..
+        if ($this->model->updateUser($id, $put_vars)) {
             $result = array(
                 "status" => true,
                 'message' => "200",
@@ -256,10 +262,9 @@ class UserController extends Controller {
      * @apiName DeleteUser
      * @apiGroup User
      *
-     * @apiParam {String} email Email unique ID.
+     * @apiParam {Number} id Users unique ID.
      *
-     * @apiSuccess {String} pass Passoword of the User.
-     * @apiSuccess {String} name  Display name of the User.
+     * @apiSuccess {String} status status of the API.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -274,7 +279,7 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "token invalid!"
+     *       "message": "ID not found!"
      *     }
      */
     function delete($id) {
@@ -283,7 +288,7 @@ class UserController extends Controller {
             return;
         }
         /** check exist id */
-        $checkId = Helper::checkId("wp_user", 'ID', $id);
+        $checkId = Helper::checkId($this->model->table, 'ID', $id);
         if (!$checkId['status']) {
             $this->showJson($checkId);
             return;
@@ -302,6 +307,31 @@ class UserController extends Controller {
         $this->showJson($result);
     }
 
+    /**
+     * @api {delete} /user Update User 
+     * @apiName deleteMultiUser
+     * @apiGroup User
+     *
+     * @apiParam {String} listId eg: /deleteMulti/1,2,5.
+     *
+     * @apiSuccess {String} status status of the API.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "message": "200",
+     *     }
+     *
+     * @apiError UserNotFound The id of the User was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *       "message": "ID not found!"
+     *     }
+     */
     function deleteMulti($listId) {
         if (!$this->checkAPI('DELETE')) {
             $this->showJson();
@@ -327,9 +357,6 @@ class UserController extends Controller {
             );
         }
         $this->showJson($result);
-    }
-    private function transform($object){
-        
     }
 
 }

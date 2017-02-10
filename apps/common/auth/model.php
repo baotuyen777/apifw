@@ -7,6 +7,14 @@
 
 class authModel extends Model {
 
+    protected $adapter = array(
+        'id' => 'ID',
+        'email' => 'user_email',
+        'password' => 'user_pass',
+        'name' => 'display_name'
+    );
+    public $table = "wp_users";
+
     public function __construct() {
         parent::__construct();
     }
@@ -26,6 +34,27 @@ class authModel extends Model {
         );
         $id = $this->getVar($sql, $params);
         return $id;
+    }
+
+    public function resetPassword($email) {
+        $user = $this->getUserByEmail($email);
+        if ($user) {
+            $sql = "UPDATE " . $this->table . " SET user_activation_key =:key WHERE ID = :id ";
+            $key = rand(1000, 9999);
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(":id", $user->id);
+            $stmt->bindValue(":key", $key);
+            $result = $stmt->execute();
+
+            return array(
+                'status' => true,
+                'message' => 'Success! please check your email'
+            );
+        }
+        return array(
+            'status' => false,
+            'message' => 'email not exist!'
+        );
     }
 
     public function logout() {
