@@ -14,21 +14,34 @@ class OrderModel extends Model {
     }
 
     public function getAll($params = false) {
-        $cond = "";
+        $condUser = "";
+        $condUser = "";
         $pagination = "";
         if ($params) {
-            $cond = $params['filter'] ? ' AND name like "%' . filter_var($params['filter'], FILTER_SANITIZE_STRING) . '%"' : "";
+            $condUser = $params['user_id'] ? ' AND user_id = ' . $params['user_id'] : "";
+            $condDate = $params['date'] ? ' AND date = ' . $params['date'] : "";
+            $cond = $params['user_id'] ? ' AND user_id = ' . $params['user_id'] : "";
             $countPage = ceil($params['total'] / $params['postPerPage']);
             $start = ($params['page'] - 1) * $params['postPerPage'];
             $pagination = "limit {$start},{$params['postPerPage']}";
         }
-
-        $sql = "SELECT * FROM " . $this->table . " "
-                . "WHERE 1=1 {$cond} {$pagination}";
+//        var_dump($params);
+        $sql = "SELECT * FROM " . $this->table //. " O INNER JOIN orders_detail OD ON O.id = OD.order_id "
+                . " WHERE 1=1 {$condUser} {$condUser} {$pagination}";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return ($result);
+    }
+
+    public function getCart($order_id) {
+        $sql = "SELECT *  FROM orders_detail WHERE order_id=:id ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":id", $order_id);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+//        var_dump($result);die;
+        return $result;
     }
 
     /**
@@ -49,41 +62,60 @@ class OrderModel extends Model {
      * 
      * @param type $param
      */
-    public function add($params) {
-        $sql = "INSERT INTO " . $this->table . " SET ";
-        $count = count($params);
-        $i = 0;
-        foreach ($params as $field => $val) {
-            $i++;
+    public function add($order, $cart) {
 
+        $sql = "INSERT INTO " . $this->table . " SET ";
+        $count = count($order);
+        $i = 0;
+        $result = false;
+        foreach ($order as $field => $val) {
+            $i++;
             $sql .= trim($field) . "='" . filter_var($val, FILTER_SANITIZE_STRING) . "'";
             if ($i !== $count) {
                 $sql .= ", ";
             }
         }
         $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        return $this->db->lastInsertId();
+        if ($stmt->execute()) {
+            //insert orderdetal
+            $orderId = $this->db->lastInsertId();
+            $this->addCart($orderId, $cart);
+        }
+        return $result;
+    }
+
+    public function addCart($orderId, $cart) {
+        $sqlOrderDetail = "INSERT INTO orders_detail(order_id,product_id,quantity) values ";
+        $i = 0;
+        $countCart = count($cart);
+        foreach ($cart as $productId => $quantity) {
+            $i++;
+            $sqlOrderDetail .= "(" . $orderId . "," . $productId . "," . $quantity . ")";
+            if ($i !== $countCart) {
+                $sqlOrderDetail .= ", ";
+            }
+        }
+        $stmtDetail = $this->db->prepare($sqlOrderDetail);
+        $result = $stmtDetail->execute();
+        return $result;
     }
 
     /**
      * 
      * @param type $param
      */
-    public function update($id, $params) {
-        $sql = "UPDATE " . $this->table . " SET ";
-        $count = count($params);
-        $i = 0;
-        foreach ($params as $field => $val) {
-            $i++;
-            $sql .= trim($field) . "='" . filter_var($val, FILTER_SANITIZE_STRING) . "'";
-            if ($i !== $count) {
-                $sql .= ", ";
-            }
+    public function update($orderId, $cart) {
+        $result = false;
+        if ($this->deleteCart($orderId)) {
+            $result = $this->addCart($orderId, $cart);
         }
-        $sql .= " WHERE id= :id";
+        return $result;
+    }
+
+    public function deleteCart($orderId) {
+        $sql = "DELETE FROM orders_detail WHERE order_id = :id";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":id", $id);
+        $stmt->bindValue(":id", $orderId);
         $result = $stmt->execute();
         return $result;
     }

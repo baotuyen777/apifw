@@ -38,11 +38,8 @@ class initModel extends Model {
     public function createOrder() {
         $sql = "CREATE TABLE orders (
             id INT (6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            code INT (11) UNSIGNED NOT NULL ,
             user_id INT (11) NOT NULL,
-            product_id INT (11) NOT NULL,
-            quantity INT (11) DEFAULT 1,
-            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            date DATE NOT NULL,
             note VARCHAR (255) ,
             status INT (2) DEFAULT 1
           ) ;";
@@ -50,7 +47,18 @@ class initModel extends Model {
         $result = $stmt->execute();
         return $result;
     }
-    
+
+    public function createOrderDetail() {
+        $sql = "CREATE TABLE orders_detail (
+            id INT (6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            order_id INT (11) UNSIGNED NOT NULL ,
+            product_id INT (11) NOT NULL,
+            quantity INT (11) DEFAULT 1
+          ) ;";
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute();
+        return $result;
+    }
 
 }
 

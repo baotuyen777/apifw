@@ -28,17 +28,17 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {get} /product Request Product information
+     * @api {get} /product Request Order information
      * @apiName All
-     * @apiGroup Product
+     * @apiGroup Order
      *
-     * @apiParam {Number} id Products unique ID.
+     * @apiParam {Number} id Orders unique ID.
      * @apiParam {Number} postPerPage Post Per Page.
-     * @apiParam {String} filter Products .
+     * @apiParam {String} filter Orders .
      * @apiParam {Number} page Page .
      *
      * @apiSuccess {Number} postPerPage Post Per Page.
-     * @apiSuccess {String} filter  Filter of the Product.
+     * @apiSuccess {String} filter  Filter of the Order.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -69,29 +69,57 @@ class OrderController extends Controller {
 
         $arrAllData = $this->model->getAll();
         $params = array(
-            'postPerPage' => isset($_REQUEST['postPerPage']) ? filter_var($_REQUEST['postPerPage'], FILTER_SANITIZE_STRING) : 10,
-            'filter' => isset($_REQUEST['filter']) ? filter_var($_REQUEST['filter'], FILTER_SANITIZE_STRING) : "",
-            'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_STRING) : 1,
+            'postPerPage' => isset($_REQUEST['postPerPage']) ? filter_var($_REQUEST['postPerPage'], FILTER_SANITIZE_NUMBER_INT) : 30,
+            'user_id' => isset($_REQUEST['user_id']) ? filter_var($_REQUEST['user_id'], FILTER_SANITIZE_NUMBER_INT) : "",
+            'date' => isset($_REQUEST['date']) ? filter_var($_REQUEST['date'], FILTER_SANITIZE_NUMBER_INT) : "",
+            'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_NUMBER_INT) : 1,
             'total' => count($arrAllData)
         );
 
         $arrAllDataPagination = $this->model->getAll($params);
+        $reData = array();
+//        foreach ($arrAllDataPagination as $object) {
+//            $order[$object['order_id']] = array(
+//                'orderId' => (int)$object['order_id'],
+//                'note' => $object['note'],
+//                'date' => $object['date'],
+//                'status' => (int)$object['status']
+//            );
+//            foreach ($arrAllDataPagination as $object2) {
+//                if ($object['order_id'] == $object2['order_id']) {
+//                    $order[$object['order_id']]['cart'] = array('productId' => $object2['product_id'], 'quantity' => $object2['quantity']);
+//                }
+//            }
+//            $reData[]=$order;
+//        }
+        foreach ($arrAllDataPagination as $object) {
+            $cart = $this->model->getCart($object['id']);
+            $reData[] = array(
+                'orderId' => (int) $object['id'],
+                'note' => $object['note'],
+                'date' => $object['date'],
+                'status' => (int) $object['status'],
+                'cart' => $cart
+            );
+        }
         $result = array(
             "status" => true,
-            'data' => $arrAllDataPagination,
+            'data' => $reData,
         );
+
+//        foreach ($result as )
         $result = array_merge($params, $result);
         $this->showJson($result);
     }
 
     /**
-     * @api {get} /product/:id Request detail Product information
+     * @api {get} /product/:id Request detail Order information
      * @apiName Detail
-     * @apiGroup Product
+     * @apiGroup Order
      *
-     * @apiParam {Number} id Products unique ID.
+     * @apiParam {Number} id Orders unique ID.
      *
-     * @apiSuccess {String} data Firstname of the Product.
+     * @apiSuccess {String} data Firstname of the Order.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -101,7 +129,7 @@ class OrderController extends Controller {
      *       "data": [],
      *     }
      *
-     * @apiError ProductNotFound The id of the Product was not found.
+     * @apiError OrderNotFound The id of the Order was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
@@ -117,9 +145,17 @@ class OrderController extends Controller {
         }
         if ($id) {
             $arrSingleObject = $this->model->getSingle(filter_var($id, FILTER_SANITIZE_NUMBER_INT));
+            $cart = $this->model->getCart($arrSingleObject['id']);
+            $reData = array(
+                'orderId' => (int) $object['id'],
+                'note' => $arrSingleObject['note'],
+                'date' => $arrSingleObject['date'],
+                'status' => (int) $arrSingleObject['status'],
+                'cart' => $cart
+            );
             $result = array(
                 "status" => true,
-                'data' => $arrSingleObject,
+                'data' => $reData,
             );
             if (!$arrSingleObject) {
                 $result = array(
@@ -133,9 +169,9 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {post} /product Request Product information
-     * @apiName AddProduct
-     * @apiGroup Product
+     * @api {post} /product Request Order information
+     * @apiName Add
+     * @apiGroup Order
      *
      * @apiParam {String} cart cart 
      * @apiParam {String} date date 
@@ -150,7 +186,7 @@ class OrderController extends Controller {
      *       "id": 10
      *     }
      *
-     * @apiError ProductNotFound The id of the Product was not found.
+     * @apiError OrderNotFound The id of the Order was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
@@ -160,26 +196,35 @@ class OrderController extends Controller {
      *     }
      */
     function add() {
-        $this->requireFields = array('cart');
+        $this->requireFields = array('cart', 'date');
         if (!$this->checkAPI('POST')) {
             $this->showJson();
             return;
         }
-        $cart = json_decode($_POST['cart']);
+        $cart = (array) json_decode($_POST['cart']);
         $status = true;
         $mes = "something wrong! please contact admin!";
-        foreach ($cart as $productId => $quantity) {
-            if (!$this->model->checkProduct($productId)) {
-                $status = false;
-                $mes = 'product_id not found {' . $productId . '}';
-                break;
+        if (!$cart) {
+            $status = false;
+            $mes = 'cart invalid! eg {"1":2,"3":2}';
+        } else {
+            $params = array();
+            foreach ($cart as $productId => $quantity) {
+                if (!$this->model->checkProduct($productId)) {
+                    $status = false;
+                    $mes = 'product_id not found {' . $productId . '}';
+                    break;
+                }
             }
         }
+//        $params[] = "(" . "'" . $time . "'," . "'" . $this->token->user . "'," . "'" . $productId . "'," . "'" . $quantity . "'," . "'" . $_POST['date'] . "'," . "'" . $node . "')";
+        $order = array(
+            'user_id' => $this->token->user,
+            'date' => $_POST['date'],
+            'note' => isset($_POST['note']) ? $_POST['note'] : ''
+        );
         if ($status) {
-            $params = $_POST;
-            $params['code'] = time();
-            $params['user'] = $this->token->user;
-            $id = $this->model->add($params);
+            $id = $this->model->add($order, $cart);
             if ($id) {
                 $status = true;
                 $mes = "Create order success";
@@ -187,17 +232,17 @@ class OrderController extends Controller {
         }
         $result = array(
             "status" => $status,
-            "message" => $mes
+            "message" => $mes,
         );
         $this->showJson($result);
     }
 
     /**
-     * @api {put} /product Update Product 
-     * @apiName UpdateProduct
-     * @apiGroup Product
+     * @api {put} /product Update Order 
+     * @apiName Update
+     * @apiGroup Order
      *
-     * @apiParam {Number} id Products unique ID.
+     * @apiParam {Number} id Orders unique ID.
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -208,7 +253,7 @@ class OrderController extends Controller {
      *       "message": "200",
      *     }
      *
-     * @apiError ProductNotFound The id of the Product was not found.
+     * @apiError OrderNotFound The id of the Order was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
@@ -230,9 +275,26 @@ class OrderController extends Controller {
             return;
         }
         parse_str(file_get_contents("php://input"), $put_vars);
-//validate
-//..
-        if ($this->model->update($id, $put_vars)) {
+        $cart = (array) json_decode($put_vars['cart']);
+       
+        $status = true;
+        $mes = "something wrong! please contact admin!";
+        if (!$cart) {
+            $status = false;
+            $mes = 'cart invalid! eg {"1":2,"3":2}';
+        } else {
+              
+            $params = array();
+            foreach ($cart as $productId => $quantity) {
+                if (!$this->model->checkProduct($productId)) {
+                    $status = false;
+                    $mes = 'product_id not found {' . $productId . '}';
+                    break;
+                }
+            }
+        }
+//       var_dump($cart);die;
+        if ($this->model->update($id, $cart)) {
             $result = array(
                 "status" => true,
                 'message' => "200",
@@ -247,11 +309,11 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {delete} /product Update Product 
-     * @apiName DeleteProduct
-     * @apiGroup Product
+     * @api {delete} /product Update Order 
+     * @apiName Delete
+     * @apiGroup Order
      *
-     * @apiParam {Number} id Products unique ID.
+     * @apiParam {Number} id Orders unique ID.
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -262,7 +324,7 @@ class OrderController extends Controller {
      *       "message": "200",
      *     }
      *
-     * @apiError ProductNotFound The id of the Product was not found.
+     * @apiError OrderNotFound The id of the Order was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
@@ -297,9 +359,9 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {delete} /product Update Product 
-     * @apiName deleteMultiProduct
-     * @apiGroup Product
+     * @api {delete} /product Update Order 
+     * @apiName deleteMulti
+     * @apiGroup Order
      *
      * @apiParam {String} listId eg: /deleteMulti/1,2,5.
      *
@@ -312,7 +374,7 @@ class OrderController extends Controller {
      *       "message": "200",
      *     }
      *
-     * @apiError ProductNotFound The id of the Product was not found.
+     * @apiError OrderNotFound The id of the Order was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found

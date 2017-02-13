@@ -14,8 +14,11 @@ class initController extends Controller {
         $status = true;
         if (!$this->model->createProduct()) {
             $status = false;
-        } 
+        }
         if (!$this->model->createOrder()) {
+            $status = false;
+        }
+        if (!$this->model->createOrderDetail()) {
             $status = false;
         }
         $result = array(
