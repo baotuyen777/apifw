@@ -53,7 +53,7 @@ abstract class Model {
      * @return type
      */
     public function getUserByEmail($email) {
-        $sql = "SELECT ID as id FROM " . $this->table . " WHERE user_email=:email ";
+        $sql = "SELECT ID as id, user_activation_key as activation_key, user_email as email FROM " . $this->table . " WHERE user_email=:email ";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":email", $email);
         $stmt->execute();

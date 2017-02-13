@@ -36,25 +36,39 @@ class authModel extends Model {
         return $id;
     }
 
-    public function resetPassword($email) {
-        $user = $this->getUserByEmail($email);
-        if ($user) {
-            $sql = "UPDATE " . $this->table . " SET user_activation_key =:key WHERE ID = :id ";
-            $key = rand(1000, 9999);
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(":id", $user->id);
-            $stmt->bindValue(":key", $key);
-            $result = $stmt->execute();
+    public function resetPassword($user, $url) {
+        $sql = "UPDATE " . $this->table . " SET user_activation_key =:key WHERE ID = :id ";
+        $key = time();
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":id", $user->id);
+        $stmt->bindValue(":key", $key);
+        $stmt->execute();
+        $url = $url . '?email=' . $user->email . '&key=' . $key;
+        $content = "<html><body>"
+                . "Please click below link to confirm reset password <br><br>"
+                . "<a href='" . $url . "'>" . $url . "</a><br>"
+                . "<p>If this is the mistake, please do not do anything!</p>"
+                . "<p style='color:#ccc'>/***** This is email automatic send by zaiko system *****/<p>"
+                . "</body></html>";
 
-            return array(
-                'status' => true,
-                'message' => 'Success! please check your email'
-            );
-        }
-        return array(
-            'status' => false,
-            'message' => 'email not exist!'
-        );
+        Helper::sendMail($user->email, 'Reset password!', $content);
+        return true;
+    }
+
+    /**
+     * 
+     * @param type $param
+     */
+    public function changePassword($user, $password) {
+
+        $sql = "UPDATE " . $this->table . " SET user_pass=:pass, user_activation_key = :key";
+        $sql .= " WHERE ID= :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":pass", md5($password));
+        $stmt->bindValue(":key", time());
+        $stmt->bindValue(":id", $user->id);
+        $result = $stmt->execute();
+        return $result;
     }
 
     public function logout() {

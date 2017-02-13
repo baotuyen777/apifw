@@ -42,11 +42,12 @@ class Bootstrap {
         //find module in common
         $app = 'common';
         $file = 'apps/' . $app . '/' . $url[0] . '/controller.php';
+      
         if (file_exists($file)) {
             require $file;
             $module = $url[0];
             $method = isset($url[1]) ? $url[1] : false;
-           
+
             if ($method > 0) {
                 $param = $method;
                 $method = 'index';
@@ -57,12 +58,18 @@ class Bootstrap {
             // find module in other apps
             if (isset($url[1])) {
                 $file = 'apps/' . $url[0] . '/' . $url[1] . '/controller.php';
+                  
                 if (file_exists($file)) {
                     require $file;
                     $app = $url[0];
                     $module = $url[1];
                     $method = isset($url[2]) ? $url[2] : false;
-                    $param = isset($url[3]) ? $url[3] : false;
+                    if ($method > 0) {
+                        $param = $method;
+                        $method = 'index';
+                    } else {
+                        $param = isset($url[3]) ? $url[3] : false;
+                    }
                 }
             } else {
                 $this->error();

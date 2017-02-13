@@ -11,7 +11,13 @@ class initController extends Controller {
             $this->showJson();
             return;
         }
-        $status = $this->model->createStruct();
+        $status = true;
+        if (!$this->model->createProduct()) {
+            $status = false;
+        } 
+        if (!$this->model->createOrder()) {
+            $status = false;
+        }
         $result = array(
             "status" => $status,
             'message' => "",
