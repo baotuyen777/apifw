@@ -21,6 +21,9 @@ class initController extends Controller {
         if (!$this->model->createOrderDetail()) {
             $status = false;
         }
+        if (!$this->model->createUser()) {
+            $status = false;
+        }
         $result = array(
             "status" => $status,
             'message' => "",

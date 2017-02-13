@@ -5,7 +5,7 @@ class authController extends Controller {
     public $auth;
 
     function __construct() {
-        parent::__construct('common', 'auth');
+        parent::__construct();
     }
 
     function index() {

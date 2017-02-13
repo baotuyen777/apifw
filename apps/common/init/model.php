@@ -59,6 +59,24 @@ class initModel extends Model {
         $result = $stmt->execute();
         return $result;
     }
+     public function createUser() {
+        $sql = "CREATE TABLE users (
+            id INT (6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(100) NOT NULL,
+            password VARCHAR(100) NOT NULL,
+            activation_key VARCHAR(100) ,
+            name VARCHAR(100) NOT NULL,
+            birthday DATE ,
+            avatar VARCHAR(255) ,
+            gender TINYINT   DEFAULT 1 ,
+            role TINYINT DEFAULT 1,
+            wallet  FLOAT DEFAULT 0,
+            status INT (2) DEFAULT 1
+          ) ;";
+        $stmt = $this->db->prepare($sql);
+        $result = $stmt->execute();
+        return $result;
+    }
 
 }
 

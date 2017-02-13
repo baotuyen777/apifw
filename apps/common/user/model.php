@@ -7,13 +7,7 @@
 
 class UserModel extends Model {
 
-    protected $adapter = array(
-        'id' => 'ID',
-        'email' => 'user_email',
-        'password' => 'user_pass',
-        'name' => 'display_name'
-    );
-    public $table = "wp_users";
+    public $table = "users";
 
     public function __construct() {
         parent::__construct();
@@ -29,12 +23,12 @@ class UserModel extends Model {
             $pagination = "limit {$start},{$params['postPerPage']}";
         }
 
-        $sql = "SELECT ID, user_email, display_name FROM " . $this->table . " "
+        $sql = "SELECT id, email, name,avatar FROM " . $this->table . " "
                 . "WHERE 1=1 {$cond} {$pagination}";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $this->transforms($result);
+        return $result;
     }
 
     /**
@@ -43,7 +37,7 @@ class UserModel extends Model {
      * @return type
      */
     public function getSingleUser($id) {
-        $sql = "SELECT ID, user_email, display_name  FROM " . $this->table . " WHERE ID=:id ";
+        $sql = "SELECT id, email, name  FROM " . $this->table . " WHERE id =:id ";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":id", $id);
         $stmt->execute();
@@ -51,14 +45,11 @@ class UserModel extends Model {
         return $this->transform($result);
     }
 
-    
-
     /**
      * 
      * @param type $param
      */
-    public function addUser($put_vars) {
-        $params = $this->transformInvert($put_vars);
+    public function addUser($params) {
         $sql = "INSERT INTO " . $this->table . " SET ";
         $count = count($params);
         $i = 0;
@@ -79,9 +70,7 @@ class UserModel extends Model {
      * 
      * @param type $param
      */
-    public function updateUser($id, $put_vars) {
-        $params = $this->transformInvert($put_vars);
-
+    public function updateUser($id, $params) {
         $sql = "UPDATE " . $this->table . " SET ";
         $count = count($params);
         $i = 0;
@@ -92,7 +81,7 @@ class UserModel extends Model {
                 $sql .= ", ";
             }
         }
-        $sql .= " WHERE ID= :id";
+        $sql .= " WHERE id= :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":id", $id);
         $result = $stmt->execute();
@@ -100,21 +89,13 @@ class UserModel extends Model {
     }
 
     public function deleteUser($listId) {
-        $sql = "DELETE FROM " . $this->table . " WHERE ID IN ($listId)";
+        $sql = "DELETE FROM " . $this->table . " WHERE id IN ($listId)";
         $stmt = $this->db->prepare($sql);
 //        $stmt->bindValue(":listId", $listId);
         $result = $stmt->execute();
         return $result;
     }
 
-//    function transform($result) {
-//        return [
-//            'id' => $result['ID'],
-////            'password' => $result['user_pass'],
-//            'email' => $result['user_email'],
-//            'name' => $result['display_name']
-//        ];
-//    }
 }
 
 ?>

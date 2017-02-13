@@ -166,40 +166,29 @@ class UserController extends Controller {
             $this->showJson();
             return;
         }
-
-//        $params = array(
-//            'user_email' => $_POST['email'],
-//            'user_pass' => md5($_POST['password']),
-//            'display_name' => $_POST['name']
-//        );
         $params = $_POST;
         $params['password'] = md5($_POST['password']);
         $email = ($_POST["email"]);
         //validate email
-        $flag= false;
+        $status = false;
+        $mes = "something wrong! please contact admin!";
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "Invalid email format";
-            $result = array(
-                "status" => false,
-                'message' => $error,
-            );
-            $this->showJson();
-            return;
-        }
-
-        $id = $this->model->addUser($params);
-        if ($id) {
-            $result = array(
-                "status" => true,
-                'id' => $id,
-            );
+            $mes = "Invalid email format";
+        } else if ($this->model->getUserByEmail($email)) {
+            $mes = "Email existed!";
         } else {
-            $result = array(
-                "status" => false,
-                'message' => "something wrong! please contact admin!",
-            );
+            $id = $this->model->addUser($params);
+            if ($id) {
+                $mes = "Success";
+                $status = true;
+            } else {
+                $mes = "Server overload!";
+            }
         }
-
+        $result = array(
+            "status" => $status,
+            'message' => $mes,
+        );
         $this->showJson($result);
     }
 

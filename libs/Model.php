@@ -39,7 +39,7 @@ abstract class Model {
      * @return type
      */
     function getUserById($id) {
-        $sql = 'SELECT ID, user_login, user_email, user_status, display_name FROM wp_users WHERE ID= :id';
+        $sql = 'SELECT id, activation_key, email,name FROM users WHERE id= :id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
@@ -53,7 +53,7 @@ abstract class Model {
      * @return type
      */
     public function getUserByEmail($email) {
-        $sql = "SELECT ID as id, user_activation_key as activation_key, user_email as email FROM " . $this->table . " WHERE user_email=:email ";
+        $sql = "SELECT id, activation_key, email,name FROM users WHERE email=:email ";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":email", $email);
         $stmt->execute();
@@ -61,43 +61,34 @@ abstract class Model {
         return $result;
     }
 
-    function transforms($result) {
-        return array_map([$this, 'transform'], $result);
-    }
-
-    function transform($result) {
-        $adapter = array_flip($this->adapter);
-        $data = array();  // set up a return array
-        foreach ($result as $k => $v) {
-            foreach ($adapter as $virtual => $real) {
-                if ($k == $virtual) {
-                    $data[$real] = $v;
-                }
-            }
-        }
-        return $data;
-    }
-
-    function transformInvert($result) {
-        $adapter = ($this->adapter);
-        $data = array();  // set up a return array
-        foreach ($result as $k => $v) {
-            foreach ($adapter as $virtual => $real) {
-                if ($k == $virtual) {
-                    $data[$real] = $v;
-                }
-            }
-        }
-        return $data;
-    }
-
-//    function transform($object) {
-//        return [
-//            'id' => $object['ID'],
-//            'password' => $object['user_pass'],
-//            'email' => $object['user_email'],
-//            'name' => $object['display_name']
-//        ];
+//    function transforms($result) {
+//        return array_map([$this, 'transform'], $result);
+//    }
+//
+//    function transform($result) {
+//        $adapter = array_flip($this->adapter);
+//        $data = array();  // set up a return array
+//        foreach ($result as $k => $v) {
+//            foreach ($adapter as $virtual => $real) {
+//                if ($k == $virtual) {
+//                    $data[$real] = $v;
+//                }
+//            }
+//        }
+//        return $data;
+//    }
+//
+//    function transformInvert($result) {
+//        $adapter = ($this->adapter);
+//        $data = array();  // set up a return array
+//        foreach ($result as $k => $v) {
+//            foreach ($adapter as $virtual => $real) {
+//                if ($k == $virtual) {
+//                    $data[$real] = $v;
+//                }
+//            }
+//        }
+//        return $data;
 //    }
 }
 

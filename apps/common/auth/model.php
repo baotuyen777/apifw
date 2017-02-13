@@ -7,13 +7,7 @@
 
 class authModel extends Model {
 
-    protected $adapter = array(
-        'id' => 'ID',
-        'email' => 'user_email',
-        'password' => 'user_pass',
-        'name' => 'display_name'
-    );
-    public $table = "wp_users";
+    public $table = "users";
 
     public function __construct() {
         parent::__construct();
@@ -26,8 +20,8 @@ class authModel extends Model {
      * @return boolean
      */
     public function login($email, $password) {
-        $sql = 'SELECT ID FROM wp_users '
-                . 'WHERE user_email= :email AND user_pass= :pass';
+        $sql = 'SELECT ID FROM ' . $this->table
+                . ' WHERE email= :email AND password= :pass';
         $params = array(
             ":email" => $email,
             ":pass" => md5($password)
@@ -37,7 +31,7 @@ class authModel extends Model {
     }
 
     public function resetPassword($user, $url) {
-        $sql = "UPDATE " . $this->table . " SET user_activation_key =:key WHERE ID = :id ";
+        $sql = "UPDATE " . $this->table . " SET activation_key =:key WHERE id = :id ";
         $key = time();
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":id", $user->id);
@@ -61,8 +55,8 @@ class authModel extends Model {
      */
     public function changePassword($user, $password) {
 
-        $sql = "UPDATE " . $this->table . " SET user_pass=:pass, user_activation_key = :key";
-        $sql .= " WHERE ID= :id";
+        $sql = "UPDATE " . $this->table . " SET password=:pass, activation_key = :key";
+        $sql .= " WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":pass", md5($password));
         $stmt->bindValue(":key", time());
