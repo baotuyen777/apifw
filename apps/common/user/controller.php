@@ -32,7 +32,7 @@ class UserController extends Controller {
      * @apiName All
      * @apiGroup User
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} id Users unique id.
      * @apiParam {Number} postPerPage Post Per Page.
      * @apiParam {String} filter Users .
      * @apiParam {Number} page Page .
@@ -89,7 +89,7 @@ class UserController extends Controller {
      * @apiName Detail
      * @apiGroup User
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} id Users unique id.
      *
      * @apiSuccess {String} data Firstname of the User.
      *
@@ -133,11 +133,11 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {post} /user AddUser
-     * @apiName AddUser
+     * @api {post} /user Add
+     * @apiName Add
      * @apiGroup User
      *
-     * @apiParam {String} email Email unique ID.
+     * @apiParam {String} email Email unique id.
      * @apiParam {String} password Password .
      * @apiParam {String} name Name .
      *
@@ -172,7 +172,7 @@ class UserController extends Controller {
         //validate email
         $status = false;
         $mes = "something wrong! please contact admin!";
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALidATE_EMAIL)) {
             $mes = "Invalid email format";
         } else if ($this->model->getUserByEmail($email)) {
             $mes = "Email existed!";
@@ -197,7 +197,7 @@ class UserController extends Controller {
      * @apiName Update
      * @apiGroup User
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} id Users unique id.
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -214,7 +214,7 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *        "message": "ID not found!"
+     *        "message": "id not found!"
      *     }
      */
     function update($id) {
@@ -224,7 +224,7 @@ class UserController extends Controller {
             return;
         }
         /** check exist id */
-        $checkId = Helper::checkId($this->model->table, 'ID', $id);
+        $checkId = Helper::checkId($this->model->table, 'id', $id);
         if (!$checkId['status']) {
             $this->showJson($checkId);
             return;
@@ -251,7 +251,7 @@ class UserController extends Controller {
      * @apiName Delete
      * @apiGroup User
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} id Users unique id.
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -268,7 +268,7 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "ID not found!"
+     *       "message": "id not found!"
      *     }
      */
     function delete($id) {
@@ -277,7 +277,7 @@ class UserController extends Controller {
             return;
         }
         /** check exist id */
-        $checkId = Helper::checkId($this->model->table, 'ID', $id);
+        $checkId = Helper::checkId($this->model->table, 'id', $id);
         if (!$checkId['status']) {
             $this->showJson($checkId);
             return;
@@ -318,7 +318,7 @@ class UserController extends Controller {
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "ID not found!"
+     *       "message": "id not found!"
      *     }
      */
     function deleteMulti($listId) {
@@ -329,7 +329,7 @@ class UserController extends Controller {
         if (!$listId) {
             $this->result = array(
                 "status" => false,
-                "message" => "please input {listID} in URL eg:{/deleteMulti/1,2,5}"
+                "message" => "please input {listid} in URL eg:{/deleteMulti/1,2,5}"
             );
             $this->showJson();
             return;

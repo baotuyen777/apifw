@@ -8,7 +8,6 @@
 class OrderModel extends Model {
 
     public $table = "orders";
-
     public function __construct() {
         parent::__construct();
     }
@@ -19,7 +18,7 @@ class OrderModel extends Model {
         $pagination = "";
         if ($params) {
             $condUser = $params['user_id'] ? ' AND user_id = ' . $params['user_id'] : "";
-            $condDate = $params['date'] ? ' AND date = "' . $params['date'].'"' : "";
+            $condDate = $params['date'] ? ' AND date = "' . $params['date'] . '"' : "";
             $cond = $params['user'] ? ' AND user = ' . $params['user'] : "";
             $countPage = ceil($params['total'] / $params['postPerPage']);
             $start = ($params['page'] - 1) * $params['postPerPage'];
@@ -34,7 +33,7 @@ class OrderModel extends Model {
     }
 
     public function getCart($order_id) {
-        $sql = "SELECT *  FROM orders_detail WHERE order_id=:id ";
+        $sql = "SELECT id,product_id as productId, quantity  FROM orders_detail WHERE order_id=:id ";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":id", $order_id);
         $stmt->execute();
