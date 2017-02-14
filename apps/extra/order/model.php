@@ -15,19 +15,18 @@ class OrderModel extends Model {
 
     public function getAll($params = false) {
         $condUser = "";
-        $condUser = "";
+        $condDate = "";
         $pagination = "";
         if ($params) {
             $condUser = $params['user_id'] ? ' AND user_id = ' . $params['user_id'] : "";
-            $condDate = $params['date'] ? ' AND date = ' . $params['date'] : "";
-            $cond = $params['user_id'] ? ' AND user_id = ' . $params['user_id'] : "";
+            $condDate = $params['date'] ? ' AND date = "' . $params['date'].'"' : "";
+            $cond = $params['user'] ? ' AND user = ' . $params['user'] : "";
             $countPage = ceil($params['total'] / $params['postPerPage']);
             $start = ($params['page'] - 1) * $params['postPerPage'];
             $pagination = "limit {$start},{$params['postPerPage']}";
         }
-//        var_dump($params);
         $sql = "SELECT * FROM " . $this->table //. " O INNER JOIN orders_detail OD ON O.id = OD.order_id "
-                . " WHERE 1=1 {$condUser} {$condUser} {$pagination}";
+                . " WHERE 1=1 {$condDate} {$condUser} {$pagination}";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -109,6 +108,16 @@ class OrderModel extends Model {
         if ($this->deleteCart($orderId)) {
             $result = $this->addCart($orderId, $cart);
         }
+        return $result;
+    }
+
+    public function updateStatus($orderId, $status) {
+        $sql = "UPDATE " . $this->table . " SET status= :status";
+        $sql .= " WHERE id= :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":status", $status);
+        $stmt->bindValue(":id", $orderId);
+        $result = $stmt->execute();
         return $result;
     }
 

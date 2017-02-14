@@ -24,6 +24,9 @@ class initController extends Controller {
         if (!$this->model->createUser()) {
             $status = false;
         }
+         if (!$this->model->createDate()) {
+            $status = false;
+        }
         $result = array(
             "status" => $status,
             'message' => "",

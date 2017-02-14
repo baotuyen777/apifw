@@ -28,7 +28,7 @@ class ProductController extends Controller {
     }
 
     /**
-     * @api {get} /product Request Product information
+     * @api {get} /product All
      * @apiName All
      * @apiGroup Product
      *
@@ -85,7 +85,7 @@ class ProductController extends Controller {
     }
 
     /**
-     * @api {get} /product/:id Request detail Product information
+     * @api {get} /product/:id Detail
      * @apiName Detail
      * @apiGroup Product
      *
@@ -133,8 +133,8 @@ class ProductController extends Controller {
     }
 
     /**
-     * @api {post} /product Request Product information
-     * @apiName AddProduct
+     * @api {post} /product Add
+     * @apiName Add
      * @apiGroup Product
      *
      * @apiParam {String} email Email unique ID.
@@ -184,8 +184,8 @@ class ProductController extends Controller {
     }
 
     /**
-     * @api {put} /product Update Product 
-     * @apiName UpdateProduct
+     * @api {put} /product/:id Update
+     * @apiName Update
      * @apiGroup Product
      *
      * @apiParam {Number} id Products unique ID.
@@ -238,8 +238,8 @@ class ProductController extends Controller {
     }
 
     /**
-     * @api {delete} /product Update Product 
-     * @apiName DeleteProduct
+     * @api {delete} /product Delete 
+     * @apiName Delete
      * @apiGroup Product
      *
      * @apiParam {Number} id Products unique ID.
@@ -288,8 +288,8 @@ class ProductController extends Controller {
     }
 
     /**
-     * @api {delete} /product Update Product 
-     * @apiName deleteMultiProduct
+     * @api {delete} /product deleteMulti
+     * @apiName deleteMulti
      * @apiGroup Product
      *
      * @apiParam {String} listId eg: /deleteMulti/1,2,5.

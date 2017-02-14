@@ -77,7 +77,7 @@ class authController extends Controller {
     }
 
     /**
-     * @api {post} /logout Login 
+     * @api {post} /logout Logout 
      * @apiName Logout
      * @apiGroup Auth
      *
@@ -109,7 +109,7 @@ class authController extends Controller {
     }
 
     /**
-     * @api {post} /resetPassword1 Login 
+     * @api {post} /resetPassword1 resetPassword1 
      * @apiName resetPassword1
      * @apiGroup Auth
      *
@@ -160,7 +160,7 @@ class authController extends Controller {
     }
 
     /**
-     * @api {post} /resetPassword2 Login 
+     * @api {post} /resetPassword2 resetPassword2 
      * @apiName resetPassword2
      * @apiGroup Auth
      *

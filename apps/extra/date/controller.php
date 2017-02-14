@@ -1,6 +1,6 @@
 <?php
 
-class UserController extends Controller {
+class DateController extends Controller {
 
 //    public $auth;
 
@@ -10,11 +10,7 @@ class UserController extends Controller {
 
     function index($id) {
         if ($_SERVER['REQUEST_METHOD'] == "GET") {
-            if ($id) {
-                $this->detail($id);
-            } else {
-                $this->all();
-            }
+            $this->all();
         }
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $this->add();
@@ -28,17 +24,16 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {get} /user All
+     * @api {get} /date All
      * @apiName All
-     * @apiGroup User
+     * @apiGroup Date
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {String} date Date.
      * @apiParam {Number} postPerPage Post Per Page.
-     * @apiParam {String} filter Users .
      * @apiParam {Number} page Page .
      *
      * @apiSuccess {Number} postPerPage Post Per Page.
-     * @apiSuccess {String} filter  Filter of the User.
+     * @apiSuccess {String} filter  Filter of the Date.
      *
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
@@ -67,15 +62,15 @@ class UserController extends Controller {
             return;
         }
 
-        $arrAllData = $this->model->getAllUser();
+        $arrAllData = $this->model->getAll();
         $params = array(
             'postPerPage' => isset($_REQUEST['postPerPage']) ? filter_var($_REQUEST['postPerPage'], FILTER_SANITIZE_STRING) : 10,
-            'filter' => isset($_REQUEST['filter']) ? filter_var($_REQUEST['filter'], FILTER_SANITIZE_STRING) : "",
+            'date' => isset($_REQUEST['date']) ? filter_var($_REQUEST['date'], FILTER_SANITIZE_STRING) : "",
             'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_STRING) : 1,
             'total' => count($arrAllData)
         );
 
-        $arrAllDataPagination = $this->model->getAllUser($params);
+        $arrAllDataPagination = $this->model->getAll($params);
         $result = array(
             "status" => true,
             'data' => $arrAllDataPagination,
@@ -85,61 +80,11 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {get} /user/:id Detail
-     * @apiName Detail
-     * @apiGroup User
+     * @api {post} /date Add
+     * @apiName Add
+     * @apiGroup Date
      *
-     * @apiParam {Number} id Users unique ID.
-     *
-     * @apiSuccess {String} data Firstname of the User.
-     *
-     * @apiSuccessExample Success-Response:
-     *     HTTP/1.1 200 OK
-     *     {
-     *       "status": true,
-     *       "message": "200",
-     *       "data": [],
-     *     }
-     *
-     * @apiError UserNotFound The id of the User was not found.
-     *
-     * @apiErrorExample Error-Response:
-     *     HTTP/1.1 404 Not Found
-     *     {
-     *       "status": false,
-     *       "message": "{id} not found or deactive"
-     *     }
-     */
-    function detail($id) {
-        if (!$this->checkAPI('GET')) {
-            $this->showJson();
-            return;
-        }
-        if ($id) {
-            $arrSingleObject = $this->model->getSingleUser(filter_var($id, FILTER_SANITIZE_NUMBER_INT));
-            $result = array(
-                "status" => true,
-                'data' => $arrSingleObject,
-            );
-            if (!$arrSingleObject) {
-                $result = array(
-                    "status" => false,
-                    'message' => "{id} " . LANG::__("IdNotFound"),
-                );
-            }
-        }
-
-        $this->showJson($result);
-    }
-
-    /**
-     * @api {post} /user AddUser
-     * @apiName AddUser
-     * @apiGroup User
-     *
-     * @apiParam {String} email Email unique ID.
-     * @apiParam {String} password Password .
-     * @apiParam {String} name Name .
+     * @apiParam {String} date date unique .
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -151,53 +96,48 @@ class UserController extends Controller {
      *       "id": 10
      *     }
      *
-     * @apiError UserNotFound The id of the User was not found.
+     * @apiError DateNotFound The id of the Date was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "Please input require field {email}"
+     *       "message": "Please input require field {date}"
      *     }
      */
     function add() {
-        $this->requireFields = array('email', 'password', 'name');
+        $this->requireFields = array('date');
         if (!$this->checkAPI('POST')) {
             $this->showJson();
             return;
         }
-        $params = $_POST;
-        $params['password'] = md5($_POST['password']);
-        $email = ($_POST["email"]);
-        //validate email
-        $status = false;
+        /** check exist date */
+        $checkId = $this->model->getSingle($_POST['date']);
         $mes = "something wrong! please contact admin!";
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $mes = "Invalid email format";
-        } else if ($this->model->getUserByEmail($email)) {
-            $mes = "Email existed!";
+        $status = false;
+        if ($checkId) {
+            $mes = "date existed!";
         } else {
-            $id = $this->model->addUser($params);
+            $id = $this->model->add($_POST['date']);
             if ($id) {
-                $mes = "Success";
                 $status = true;
-            } else {
-                $mes = "Server overload!";
-            }
+                $mes = "Success!";
+            } 
         }
         $result = array(
             "status" => $status,
             'message' => $mes,
         );
+
         $this->showJson($result);
     }
 
     /**
-     * @api {put} /user/:id Update
+     * @api {put} /date/:date Update  
      * @apiName Update
-     * @apiGroup User
+     * @apiGroup Date
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} date Date unique .
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -208,31 +148,24 @@ class UserController extends Controller {
      *       "message": "200",
      *     }
      *
-     * @apiError UserNotFound The id of the User was not found.
+     * @apiError DateNotFound The id of the Date was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *        "message": "ID not found!"
+     *        "message": "date not found!"
      *     }
      */
-    function update($id) {
-
+    function update($date) {
+        $this->requireFields = array('status');
         if (!$this->checkAPI('PUT')) {
             $this->showJson();
             return;
         }
-        /** check exist id */
-        $checkId = Helper::checkId($this->model->table, 'ID', $id);
-        if (!$checkId['status']) {
-            $this->showJson($checkId);
-            return;
-        }
+
         parse_str(file_get_contents("php://input"), $put_vars);
-//validate
-//..
-        if ($this->model->updateUser($id, $put_vars)) {
+        if ($this->model->update($date, $put_vars['status'])) {
             $result = array(
                 "status" => true,
                 'message' => "200",
@@ -247,11 +180,11 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {delete} /user DeleteUser
+     * @api {delete} /date/:date Delete
      * @apiName Delete
-     * @apiGroup User
+     * @apiGroup Date
      *
-     * @apiParam {Number} id Users unique ID.
+     * @apiParam {Number} date Date unique ID.
      *
      * @apiSuccess {String} status status of the API.
      *
@@ -262,13 +195,13 @@ class UserController extends Controller {
      *       "message": "200",
      *     }
      *
-     * @apiError UserNotFound The id of the User was not found.
+     * @apiError DateNotFound The id of the Date was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
      *     {
      *       "status": false,
-     *       "message": "ID not found!"
+     *       "message": "date not found!"
      *     }
      */
     function delete($id) {
@@ -276,13 +209,7 @@ class UserController extends Controller {
             $this->showJson();
             return;
         }
-        /** check exist id */
-        $checkId = Helper::checkId($this->model->table, 'ID', $id);
-        if (!$checkId['status']) {
-            $this->showJson($checkId);
-            return;
-        }
-        if ($this->model->deleteUser($id)) {
+        if ($this->model->delete($id)) {
             $result = array(
                 "status" => true,
                 'message' => "200",
@@ -297,9 +224,9 @@ class UserController extends Controller {
     }
 
     /**
-     * @api {delete} /user deleteMulti
-     * @apiName deleteMulti
-     * @apiGroup User
+     * @api {delete} /date/:date deleteMulti
+     * @apiName deleteMultiDate
+     * @apiGroup Date
      *
      * @apiParam {String} listId eg: /deleteMulti/1,2,5.
      *
@@ -312,7 +239,7 @@ class UserController extends Controller {
      *       "message": "200",
      *     }
      *
-     * @apiError UserNotFound The id of the User was not found.
+     * @apiError DateNotFound The id of the Date was not found.
      *
      * @apiErrorExample Error-Response:
      *     HTTP/1.1 404 Not Found
@@ -334,7 +261,7 @@ class UserController extends Controller {
             $this->showJson();
             return;
         }
-        if ($this->model->deleteUser(filter_var($listId, FILTER_SANITIZE_STRING))) {
+        if ($this->model->deleteDate(filter_var($listId, FILTER_SANITIZE_STRING))) {
             $result = array(
                 "status" => true,
                 'message' => "200",

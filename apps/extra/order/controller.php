@@ -28,13 +28,13 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {get} /product Request Order information
+     * @api {get} /product All
      * @apiName All
      * @apiGroup Order
      *
-     * @apiParam {Number} id Orders unique ID.
+     * @apiParam {Number} user userId unique ID.
      * @apiParam {Number} postPerPage Post Per Page.
-     * @apiParam {String} filter Orders .
+     * @apiParam {String} date Date .
      * @apiParam {Number} page Page .
      *
      * @apiSuccess {Number} postPerPage Post Per Page.
@@ -70,7 +70,7 @@ class OrderController extends Controller {
         $arrAllData = $this->model->getAll();
         $params = array(
             'postPerPage' => isset($_REQUEST['postPerPage']) ? filter_var($_REQUEST['postPerPage'], FILTER_SANITIZE_NUMBER_INT) : 30,
-            'user_id' => isset($_REQUEST['user_id']) ? filter_var($_REQUEST['user_id'], FILTER_SANITIZE_NUMBER_INT) : "",
+            'user_id' => isset($_REQUEST['user']) ? filter_var($_REQUEST['user'], FILTER_SANITIZE_NUMBER_INT) : "",
             'date' => isset($_REQUEST['date']) ? filter_var($_REQUEST['date'], FILTER_SANITIZE_NUMBER_INT) : "",
             'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_NUMBER_INT) : 1,
             'total' => count($arrAllData)
@@ -113,7 +113,7 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {get} /product/:id Request detail Order information
+     * @api {get} /product/:id Detail
      * @apiName Detail
      * @apiGroup Order
      *
@@ -169,11 +169,11 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {post} /product Request Order information
+     * @api {post} /product Add
      * @apiName Add
      * @apiGroup Order
      *
-     * @apiParam {String} cart cart 
+     * @apiParam {String} cart Stringify cart object 
      * @apiParam {String} date date 
      *
      * @apiSuccess {String} status status of the API.
@@ -238,7 +238,7 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {put} /product Update Order 
+     * @api {put} /product Update  
      * @apiName Update
      * @apiGroup Order
      *
@@ -263,7 +263,7 @@ class OrderController extends Controller {
      *     }
      */
     function update($id) {
-
+        $this->requireFields = array('cart', 'date');
         if (!$this->checkAPI('PUT')) {
             $this->showJson();
             return;
@@ -276,14 +276,14 @@ class OrderController extends Controller {
         }
         parse_str(file_get_contents("php://input"), $put_vars);
         $cart = (array) json_decode($put_vars['cart']);
-       
+
         $status = true;
         $mes = "something wrong! please contact admin!";
         if (!$cart) {
             $status = false;
             $mes = 'cart invalid! eg {"1":2,"3":2}';
         } else {
-              
+
             $params = array();
             foreach ($cart as $productId => $quantity) {
                 if (!$this->model->checkProduct($productId)) {
@@ -309,7 +309,58 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {delete} /product Update Order 
+     * @api {put} /product/updateStatus/:id UpdateStatus 
+     * @apiName Update
+     * @apiGroup Order
+     *
+     * @apiParam {Number} id Orders unique ID.
+     *
+     * @apiSuccess {String} status status of the API.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "message": "200",
+     *     }
+     *
+     * @apiError OrderNotFound The id of the Order was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *        "message": "ID not found!"
+     *     }
+     */
+    function updateStatus($id) {
+        $this->requireFields = array('status');
+        if (!$this->checkAPI('PUT')) {
+            $this->showJson();
+            return;
+        }
+        /** check exist id */
+        $checkId = Helper::checkId($this->model->table, 'ID', $id);
+        if (!$checkId['status']) {
+            $this->showJson($checkId);
+            return;
+        }
+        parse_str(file_get_contents("php://input"), $put_vars);
+        $status = false;
+        $mes = "something wrong! please contact admin!";
+        if ($this->model->updateStatus($id, $put_vars['status'])) {
+            $mes = "success";
+            $status = true;
+        }
+        $result = array(
+            "status" => $status,
+            'message' => $mes,
+        );
+        $this->showJson($result);
+    }
+
+    /**
+     * @api {delete} /product/:id Delete 
      * @apiName Delete
      * @apiGroup Order
      *
@@ -359,7 +410,7 @@ class OrderController extends Controller {
     }
 
     /**
-     * @api {delete} /product Update Order 
+     * @api {delete} /product/:listId deleteMulti
      * @apiName deleteMulti
      * @apiGroup Order
      *

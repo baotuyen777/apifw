@@ -39,7 +39,7 @@ abstract class Model {
      * @return type
      */
     function getUserById($id) {
-        $sql = 'SELECT id, activation_key, email,name FROM users WHERE id= :id';
+        $sql = 'SELECT id, activation_key, email,name,birthday,avatar,gender,role,wallet,status FROM users WHERE id= :id';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
