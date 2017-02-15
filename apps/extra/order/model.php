@@ -17,9 +17,9 @@ class OrderModel extends Model {
         $condDate = "";
         $pagination = "";
         if ($params) {
-            $condUser = $params['user_id'] ? ' AND user_id = ' . $params['user_id'] : "";
+            $condUser = $params['user'] ? ' AND user_id = ' . $params['user'] : "";
             $condDate = $params['date'] ? ' AND date = "' . $params['date'] . '"' : "";
-            $cond = $params['user'] ? ' AND user = ' . $params['user'] : "";
+//            $cond = $params['user'] ? ' AND user = ' . $params['user'] : "";
             $countPage = ceil($params['total'] / $params['postPerPage']);
             $start = ($params['page'] - 1) * $params['postPerPage'];
             $pagination = "limit {$start},{$params['postPerPage']}";

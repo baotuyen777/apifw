@@ -70,7 +70,7 @@ class OrderController extends Controller {
         $arrAllData = $this->model->getAll();
         $params = array(
             'postPerPage' => isset($_REQUEST['postPerPage']) ? filter_var($_REQUEST['postPerPage'], FILTER_SANITIZE_NUMBER_INT) : 30,
-            'user_id' => isset($_REQUEST['user']) ? filter_var($_REQUEST['user'], FILTER_SANITIZE_NUMBER_INT) : "",
+            'user' => isset($_REQUEST['user']) ? filter_var($_REQUEST['user'], FILTER_SANITIZE_NUMBER_INT) : "",
             'date' => isset($_REQUEST['date']) ? filter_var($_REQUEST['date'], FILTER_SANITIZE_NUMBER_INT) : "",
             'page' => isset($_REQUEST['page']) ? filter_var($_REQUEST['page'], FILTER_SANITIZE_NUMBER_INT) : 1,
             'total' => count($arrAllData)
