@@ -41,6 +41,7 @@ class initModel extends Model {
             user_id INT (11) NOT NULL,
             date DATE NOT NULL,
             note VARCHAR (255) ,
+            total INT(11) NOT NULL,
             status INT (2) DEFAULT 1
           ) ;";
         $stmt = $this->db->prepare($sql);

@@ -92,18 +92,36 @@ class OrderController extends Controller {
 //            }
 //            $reData[]=$order;
 //        }
+        $total = 0;
+        $totalCart = array();
         foreach ($arrAllDataPagination as $object) {
             $cart = $this->model->getCart($object['id']);
+            foreach ($cart as $product) {
+                if (isset($totalCart[$product['productId']])) {
+//                    var_dump($totalCart[$product['productId']]);
+                    $totalCart[$product['productId']]['quantity'] += (int) $product['quantity'];
+                } else {
+                    $totalCart[$product['productId']]['quantity'] = (int) $product['quantity'];
+                    $totalCart[$product['productId']]['name'] = $product['name'];
+                    $totalCart[$product['productId']]['productId'] = $product['productId'];
+                }
+            }
+            $total += (int) $object['total'];
             $reData[] = array(
                 'orderId' => (int) $object['id'],
+                'name' => $object['name'],
                 'note' => $object['note'],
                 'date' => $object['date'],
                 'status' => (int) $object['status'],
+                'total' => (int) $object['total'],
                 'cart' => $cart
             );
         }
+//        var_dump(array_values($totalCart));
         $result = array(
             "status" => true,
+            'totalPrice' => $total,
+            'totalCart' => array_values($totalCart),
             'data' => $reData,
         );
 
@@ -209,25 +227,31 @@ class OrderController extends Controller {
             $mes = 'cart invalid! eg {"1":2,"3":2}';
         } else {
             $params = array();
+            $total = 0;
             foreach ($cart as $productId => $quantity) {
-                if (!$this->model->checkProduct($productId)) {
+                $product = $this->model->checkProduct($productId);
+                if (!$product) {
                     $status = false;
                     $mes = 'product_id not found {' . $productId . '}';
                     break;
                 }
+                $total += $product['price'] * $quantity;
             }
         }
 //        $params[] = "(" . "'" . $time . "'," . "'" . $this->token->user . "'," . "'" . $productId . "'," . "'" . $quantity . "'," . "'" . $_POST['date'] . "'," . "'" . $node . "')";
-        $order = array(
-            'user_id' => $this->token->user,
-            'date' => $_POST['date'],
-            'note' => isset($_POST['note']) ? $_POST['note'] : ''
-        );
         if ($status) {
+            $order = array(
+                'user_id' => $this->token->user,
+                'date' => $_POST['date'],
+                'note' => isset($_POST['note']) ? $_POST['note'] : '',
+                'total' => $total
+            );
             $id = $this->model->add($order, $cart);
             if ($id) {
                 $status = true;
                 $mes = "Create order success";
+            } else {
+                $status = false;
             }
         }
         $result = array(

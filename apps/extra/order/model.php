@@ -8,6 +8,7 @@
 class OrderModel extends Model {
 
     public $table = "orders";
+
     public function __construct() {
         parent::__construct();
     }
@@ -24,7 +25,7 @@ class OrderModel extends Model {
             $start = ($params['page'] - 1) * $params['postPerPage'];
             $pagination = "limit {$start},{$params['postPerPage']}";
         }
-        $sql = "SELECT * FROM " . $this->table //. " O INNER JOIN orders_detail OD ON O.id = OD.order_id "
+        $sql = "SELECT O.*, U.name FROM " . $this->table . " O INNER JOIN users U ON O.user_id = U.id "
                 . " WHERE 1=1 {$condDate} {$condUser} {$pagination}";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -33,7 +34,7 @@ class OrderModel extends Model {
     }
 
     public function getCart($order_id) {
-        $sql = "SELECT id,product_id as productId, quantity  FROM orders_detail WHERE order_id=:id ";
+        $sql = "SELECT OD.id, OD.product_id as productId, OD.quantity, P.name,P.price  FROM orders_detail OD INNER JOIN products P ON OD.product_id=P.id  WHERE order_id=:id ";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(":id", $order_id);
         $stmt->execute();
@@ -78,6 +79,7 @@ class OrderModel extends Model {
             //insert orderdetal
             $orderId = $this->db->lastInsertId();
             $this->addCart($orderId, $cart);
+            $result = true;
         }
         return $result;
     }
