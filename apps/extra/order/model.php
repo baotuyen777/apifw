@@ -88,9 +88,9 @@ class OrderModel extends Model {
         $sqlOrderDetail = "INSERT INTO orders_detail(order_id,product_id,quantity) values ";
         $i = 0;
         $countCart = count($cart);
-        foreach ($cart as $productId => $quantity) {
+        foreach ($cart as $cartDetail) {
             $i++;
-            $sqlOrderDetail .= "(" . $orderId . "," . $productId . "," . $quantity . ")";
+            $sqlOrderDetail .= "(" . $orderId . "," . $cartDetail->productId . "," . $cartDetail->quantity . ")";
             if ($i !== $countCart) {
                 $sqlOrderDetail .= ", ";
             }

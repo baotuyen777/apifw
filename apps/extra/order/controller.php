@@ -228,14 +228,14 @@ class OrderController extends Controller {
         } else {
             $params = array();
             $total = 0;
-            foreach ($cart as $productId => $quantity) {
-                $product = $this->model->checkProduct($productId);
+            foreach ($cart as $cartDetail) {
+                $product = $this->model->checkProduct($cartDetail->productId);
                 if (!$product) {
                     $status = false;
-                    $mes = 'product_id not found {' . $productId . '}';
+                    $mes = 'product_id not found {' . $cartDetail->productId . '}';
                     break;
                 }
-                $total += $product['price'] * $quantity;
+                $total += $product['price'] * $cartDetail->quantity;
             }
         }
 //        $params[] = "(" . "'" . $time . "'," . "'" . $this->token->user . "'," . "'" . $productId . "'," . "'" . $quantity . "'," . "'" . $_POST['date'] . "'," . "'" . $node . "')";
