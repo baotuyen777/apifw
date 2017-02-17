@@ -109,6 +109,7 @@ class OrderController extends Controller {
             $total += (int) $object['total'];
             $reData[] = array(
                 'orderId' => (int) $object['id'],
+                'userId' => (int) $object['user_id'],
                 'name' => $object['name'],
                 'note' => $object['note'],
                 'date' => $object['date'],
@@ -226,7 +227,7 @@ class OrderController extends Controller {
             $status = false;
             $mes = 'cart invalid! eg {"1":2,"3":2}';
         } else {
-            $params = array();
+//            $params = array();
             $total = 0;
             foreach ($cart as $cartDetail) {
                 $product = $this->model->checkProduct($cartDetail->productId);
@@ -307,28 +308,32 @@ class OrderController extends Controller {
             $status = false;
             $mes = 'cart invalid! eg {"1":2,"3":2}';
         } else {
-
-            $params = array();
-            foreach ($cart as $productId => $quantity) {
-                if (!$this->model->checkProduct($productId)) {
+            $total = 0;
+//            $params = array();
+            foreach ($cart as $cartDetail) {
+                $product = $this->model->checkProduct($cartDetail->productId);
+                if (!$product) {
                     $status = false;
-                    $mes = 'product_id not found {' . $productId . '}';
+                    $mes = 'product_id not found {' . $cartDetail->productId . '}';
                     break;
                 }
+                $total += $product['price'] * $cartDetail->quantity;
             }
         }
-//       var_dump($cart);die;
-        if ($this->model->update($id, $cart)) {
-            $result = array(
-                "status" => true,
-                'message' => "200",
-            );
-        } else {
-            $result = array(
-                "status" => false,
-                'message' => "you should use x-www-form-urlencoded or please contact admin!",
-            );
+        if ($status) {
+            if ($this->model->update($id, $cart, $total)) {
+                $status = false;
+                $mes = "update success";
+            } else {
+                $status = false;
+                $mes = "you should use x-www-form-urlencoded or please contact admin!";
+            }
         }
+        $result = array(
+            "status" => $status,
+            'message' => $mes,
+        );
+
         $this->showJson($result);
     }
 

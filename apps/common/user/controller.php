@@ -172,7 +172,7 @@ class UserController extends Controller {
         //validate email
         $status = false;
         $mes = "something wrong! please contact admin!";
-        if (!filter_var($email, FILTER_VALidATE_EMAIL)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $mes = "Invalid email format";
         } else if ($this->model->getUserByEmail($email)) {
             $mes = "Email existed!";

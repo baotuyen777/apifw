@@ -104,10 +104,17 @@ class OrderModel extends Model {
      * 
      * @param type $param
      */
-    public function update($orderId, $cart) {
+    public function update($orderId, $cart, $total) {
         $result = false;
         if ($this->deleteCart($orderId)) {
-            $result = $this->addCart($orderId, $cart);
+            if ($this->addCart($orderId, $cart)) {
+                $sql = "UPDATE " . $this->table . " SET total= :total";
+                $sql .= " WHERE id= :id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindValue(":total", $total);
+                $stmt->bindValue(":id", $orderId);
+                $result = $stmt->execute();
+            }
         }
         return $result;
     }
