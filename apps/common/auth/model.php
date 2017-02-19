@@ -65,6 +65,27 @@ class authModel extends Model {
         return $result;
     }
 
+    /**
+     * 
+     * @param type $param
+     */
+    public function register($params) {
+        $sql = "INSERT INTO " . $this->table . " SET ";
+        $count = count($params);
+        $i = 0;
+        foreach ($params as $field => $val) {
+            $i++;
+
+            $sql .= trim($field) . "='" . filter_var($val, FILTER_SANITIZE_STRING) . "'";
+            if ($i !== $count) {
+                $sql .= ", ";
+            }
+        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $this->db->lastInsertId();
+    }
+
     public function logout() {
         echo 12121;
     }
