@@ -118,9 +118,12 @@ class OrderController extends Controller {
                 'cart' => $cart
             );
         }
+        $currentDate = $this->model->getCurrentDate($params['date']);
 //        var_dump(array_values($totalCart));
         $result = array(
             "status" => true,
+            'currentDateOrder' => $currentDate['currentDateOrder'],
+            'dateStatus' => $currentDate['status'] == 0 ? false : true ,
             'totalPrice' => $total,
             'totalCart' => array_values($totalCart),
             'data' => $reData,

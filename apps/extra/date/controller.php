@@ -122,7 +122,7 @@ class DateController extends Controller {
             if ($id) {
                 $status = true;
                 $mes = "Success!";
-            } 
+            }
         }
         $result = array(
             "status" => $status,
@@ -272,6 +272,51 @@ class DateController extends Controller {
                 'message' => "something wrong, please contact admin!",
             );
         }
+        $this->showJson($result);
+    }
+
+    /**
+     * @api {put} /date/updateStatus/:id UpdateStatus 
+     * @apiName UpdateStatus
+     * @apiGroup Date
+     *
+     * @apiParam {Number} id Orders unique ID.
+     *
+     * @apiSuccess {String} status status of the API.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "message": "200",
+     *     }
+     *
+     * @apiError OrderNotFound The id of the Order was not found.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *        "message": "ID not found!"
+     *     }
+     */
+    function updateStatus($date) {
+        $this->requireFields = array('status');
+        if (!$this->checkAPI('PUT')) {
+            $this->showJson();
+            return;
+        }
+        parse_str(file_get_contents("php://input"), $put_vars);
+        $status = false;
+        $mes = "something wrong! please contact admin!";
+        if ($this->model->updateStatus($date,  $put_vars['status'])) {
+            $mes = "success";
+            $status = true;
+        }
+        $result = array(
+            "status" => $status,
+            'message' => $mes,
+        );
         $this->showJson($result);
     }
 

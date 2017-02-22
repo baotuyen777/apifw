@@ -159,6 +159,20 @@ class OrderModel extends Model {
         return $result;
     }
 
+    public function getCurrentDate($date) {
+//        if ($date != '') {
+//            $sql = "SELECT MAX(date) as currentDateOrder, status FROM date   ";
+//        } else {
+//           
+//        }
+        $sql = "SELECT date as currentDateOrder, status FROM date  where date=:date ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":date", $date);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
 }
 
 ?>

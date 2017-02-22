@@ -31,8 +31,6 @@ class DateModel extends Model {
         return ($result);
     }
 
-
-    
     public function getSingle($date) {
         $sql = "SELECT *  FROM " . $this->table . " WHERE date=:date ";
         $stmt = $this->db->prepare($sql);
@@ -48,7 +46,6 @@ class DateModel extends Model {
      */
     public function add($date) {
         $sql = "INSERT INTO " . $this->table . " SET date=:date";
-        var_dump($sql);
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':date', $date);
         $stmt->execute();
@@ -70,13 +67,14 @@ class DateModel extends Model {
         return $result;
     }
 
-//    public function delete($listId) {
-//        $sql = "DELETE FROM " . $this->table . " WHERE id IN ($listId)";
-//        $stmt = $this->db->prepare($sql);
-////        $stmt->bindValue(":listId", $listId);
-//        $result = $stmt->execute();
-//        return $result;
-//    }
+    public function updateStatus($date, $status) {
+        $sql = "UPDATE " . $this->table . " SET status= :status WHERE date= :date";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":status", $status == "true" ? 1 : 0);
+        $stmt->bindValue(":date", $date);
+        $result = $stmt->execute();
+        return $result;
+    }
 
 }
 
