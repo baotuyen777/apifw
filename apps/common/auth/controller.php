@@ -133,24 +133,26 @@ class authController extends Controller {
      *     }
      */
     public function resetPassword1() {
-        $this->requireFields = array('email', 'url');
-        if (!$this->checkAPI('POST')) {
-            $this->showJson();
-            return;
-        }
+        $status = false;
         $mes = 'something wrong! please contact admin!';
-        $status = true;
-        $email = ($_POST["email"]);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $mes = "Invalid email format";
-            $status = false;
-        } else if (!$user = $this->model->getUserByEmail($email)) {
-            $status = false;
-            $mes = 'email not exist!';
-        }
-        if ($status) {
-            $data = $this->model->resetPassword($user, $_POST['url']);
-            $mes = 'Success! please check your email';
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+            $status = true;
+            if (!isset($_POST['email']) || !isset($_POST['url'])) {
+                $mes = "email and url are required!";
+                $status = false;
+            } elseif (!filter_var($email = ($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+                $mes = "Invalid email format";
+                $status = false;
+            } else if (!$user = $this->model->getUserByEmail($email)) {
+                $status = false;
+                $mes = 'email not exist!';
+            }
+            if ($status) {
+                $data = $this->model->resetPassword($user, $_POST['url']);
+                $mes = 'Success! please check your email';
+            }
+        } else {
+            $result['message'] = "Please use method post";
         }
         $result = array(
             'status' => $status,
@@ -186,28 +188,29 @@ class authController extends Controller {
      */
     public function resetPassword2() {
         $this->requireFields = array('email', 'key', 'password');
-        if (!$this->checkAPI('POST')) {
-            $this->showJson();
-            return;
-        }
+
         $mes = 'something wrong! please contact admin!';
         $status = true;
-        $email = ($_POST["email"]);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+//        var_dump($_POST);
+        if (!isset($_POST['email']) || !isset($_POST['key']) || !isset($_POST['password'])) {
+            $mes = "email and key and password are required!";
+            $status = false;
+        } elseif (!filter_var($email = ($_REQUEST["email"]), FILTER_VALIDATE_EMAIL)) {
             $mes = "Invalid email format";
             $status = false;
         } else if (!$user = $this->model->getUserByEmail($email)) {
             $status = false;
             $mes = 'email not exist!';
-        } else if ($user->activation_key !== $_POST['key']) {
+        } else if ($user->activation_key !== $_REQUEST['key']) {
             $status = false;
             $mes = 'wrong key!';
         }
         if ($status) {
-            if ($this->model->changePassword($user, filter_var($_POST['password'], FILTER_SANITIZE_STRING))) {
+            if ($this->model->changePassword($user, filter_var($_REQUEST['password'], FILTER_SANITIZE_STRING))) {
                 $mes = 'Success! Your password has been reset!';
+            } else {
+                $status = false;
             }
-            $status = false;
         }
         $result = array(
             'status' => $status,

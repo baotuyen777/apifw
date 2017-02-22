@@ -50,12 +50,13 @@ class Helper {
      */
     static function checkToken() {
         $headers = apache_request_headers();
-        $token = isset($headers['token']) ? $headers['token'] : false;
+        $token = isset($headers['token']) && $headers['token'] != 'undefined' ? $headers['token'] : false;
         $result = array(
             "status" => false,
             "message" => "Something wrong!"
         );
         if ($token) {
+
             $arrToken = explode(".", $token);
             $signature = ($arrToken[2]);
             $result["message"] = "token invalid!";
@@ -106,7 +107,7 @@ class Helper {
         return $result;
     }
 
-    static function sendMail($from,$subject,$content) {
+    static function sendMail($from, $subject, $content) {
         require 'PHPMailer/PHPMailerAutoload.php';
         $mail = new PHPMailer();
         $mail->IsSMTP();

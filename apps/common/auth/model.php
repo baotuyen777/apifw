@@ -37,7 +37,7 @@ class authModel extends Model {
         $stmt->bindValue(":id", $user->id);
         $stmt->bindValue(":key", $key);
         $stmt->execute();
-        $url = $url . '?email=' . $user->email . '&key=' . $key;
+        $url = $url . '/' . $user->email . '/' . $key;
         $content = "<html><body>"
                 . "Please click below link to confirm reset password <br><br>"
                 . "<a href='" . $url . "'>" . $url . "</a><br>"
