@@ -166,7 +166,7 @@ class ProductController extends Controller {
             $this->showJson();
             return;
         }
-        $params = $_POST;
+        $params = $_POST; 
         $id = $this->model->add($params);
         if ($id) {
             $result = array(

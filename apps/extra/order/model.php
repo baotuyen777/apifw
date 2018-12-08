@@ -90,7 +90,7 @@ class OrderModel extends Model {
         $countCart = count($cart);
         foreach ($cart as $cartDetail) {
             $i++;
-            $sqlOrderDetail .= "(" . $orderId . "," . $cartDetail->productId . "," . $cartDetail->quantity . ")";
+            $sqlOrderDetail .= "(" . $orderId . "," . $cartDetail->product_id . "," . $cartDetail->quantity . ")";
             if ($i !== $countCart) {
                 $sqlOrderDetail .= ", ";
             }

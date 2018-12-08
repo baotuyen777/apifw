@@ -233,10 +233,10 @@ class OrderController extends Controller {
 //            $params = array();
             $total = 0;
             foreach ($cart as $cartDetail) {
-                $product = $this->model->checkProduct($cartDetail->productId);
+                $product = $this->model->checkProduct($cartDetail->product_id);
                 if (!$product) {
                     $status = false;
-                    $mes = 'product_id not found {' . $cartDetail->productId . '}';
+                    $mes = 'product_id not found {' . $cartDetail->product_id . '}';
                     break;
                 }
                 $total += $product['price'] * $cartDetail->quantity;

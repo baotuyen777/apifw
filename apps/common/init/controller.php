@@ -7,10 +7,7 @@ class initController extends Controller {
     }
 
     function index() {
-        if (!$this->checkAPI('POST')) {
-            $this->showJson();
-            return;
-        }
+        
         $status = true;
         if (!$this->model->createProduct()) {
             $status = false;
@@ -29,7 +26,7 @@ class initController extends Controller {
         }
         $result = array(
             "status" => $status,
-            'message' => "",
+            'message' => $status==true? "Generate DB successful" : "Command does not work(may be database gennerated)!",
         );
         $this->showJson($result);
     }

@@ -11,7 +11,7 @@ abstract class Controller {
     public $model;
 
     /** @var \result */
-    public $result;
+    public $result=array();
 
     /** @var \token */
     public $token;
